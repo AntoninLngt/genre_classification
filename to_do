@@ -1,0 +1,15 @@
+
+Le code est basé sur Tensorflow qui est un framework d'apprentissage automatique très polyvalent et largement utilisé. 
+Il utilise notamment l'API de jeu de données Tensorflow pour le prétraitement des données et Keras pour la création et la formation de réseaux neuronaux.
+
+data_pipeline.py contient tous les prétraitements des données : chargement audio, calcul des fonctionnalités à partir de l'audio, formatage des étiquettes... 
+Pour l'instant, il ne fournit en réalité comme fonctionnalités qu'une partie de la forme d'onde, mais vous devrez l'améliorer.
+
+keras_model.py contient la description du modèle de réseau neuronal qui sera entraîné. 
+Pour l'instant, il s'agit d'un réseau monocouche entièrement connecté très basique, mais vous devrez l'améliorer.
+
+train_model.py est le script qui exécute la formation du modèle. Encore une fois, c'est très basique, et il va falloir l'améliorer.
+
+utils.py contient certaines fonctions utilitaires utilisées par le module data_pipeline.py
+
+fma_small.csv contient des informations sur l'ensemble de données : nom de fichier et genre pour chaque extrait de musique.
