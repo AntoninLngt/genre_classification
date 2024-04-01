@@ -22,6 +22,6 @@ RUN conda install -y -c anaconda pandas
 RUN conda install -y ffmpeg
 
 RUN mkdir /workspace/ && cd /workspace/ && git clone https://github.com/AntoninLngt/genre_classification.git
-WORKDIR /workspace/genre_classification_ensea_project
+WORKDIR /workspace/genre_classification
 
 ENTRYPOINT ["bash"]
