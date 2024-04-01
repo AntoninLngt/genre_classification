@@ -4,7 +4,6 @@
 import os
 import argparse
 import tensorflow as tf
-
 from tensorflow.contrib.training import HParams
 
 from keras_model import build_model
