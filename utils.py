@@ -26,3 +26,18 @@ def dataset_from_csv(csv_path, **kwargs):
 
     dataset = tf.data.Dataset.from_tensor_slices({key:df[key].values for key in df })
     return dataset
+
+def load_and_preprocess_audio(filename):
+    """Load an audio file and apply preprocessing."""
+    waveform = load_audio_waveform(filename)
+    
+    # Normalization
+    waveform = waveform / tf.reduce_max(tf.abs(waveform))
+    
+    # Compute MFCCs
+    mfccs = tf.signal.mfccs_from_log_mel_spectrogram(tf.math.log(tf.abs(tf.signal.stft(waveform))), 44100)
+    
+    # Compute spectrogram
+    spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
+    
+    return waveform, mfccs, spectrogram

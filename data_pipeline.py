@@ -7,36 +7,31 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-from utils import one_hot_label, load_audio_waveform, dataset_from_csv
+from utils import one_hot_label, load_audio_waveform, dataset_from_csv,load_and_preprocess_audio
 
 DATASET_DIR = "/data/fma_small/"
 
 def get_dataset(input_csv, batch_size=8):
-
-    # build dataset from csv file
+    """Function to build the dataset."""
     dataset = dataset_from_csv(input_csv)
-
-    # add directory in the filename
-    dataset = dataset.map( lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
-
-
-    n_sample = 11025
-    # load audio and take first quarter of second only
-    dataset = dataset.map( lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample,:]), num_parallel_calls=32)
-
-    # Filter out badly shaped waveforms (due to loading errors)
-    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample,2))))
-
-    # one hot encoding of labels
+    dataset = dataset.map(lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
+    
+    # Use the new function to load and preprocess audio
+    dataset = dataset.map(lambda sample: dict(sample, waveform, mfccs, spectrogram=load_and_preprocess_audio(sample["filename"])))
+    
+    # Filter out badly shaped waveforms
+    dataset = dataset.filter(lambda sample: check_valid(sample))
+    
+    # Encode labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map( lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))) )
-
-    # Select only features and annotation
-    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"]))
-
-    # Make batch
+    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
+    
+    # Select relevant features
+    dataset = dataset.map(lambda sample: (sample["waveform"], sample["mfccs"], sample["spectrogram"], sample["one_hot_label"]))
+    
+    # Create batches
     dataset = dataset.batch(batch_size)
-
+    
     return dataset
 
 
