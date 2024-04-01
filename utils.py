@@ -3,7 +3,6 @@
 """
 import tensorflow as tf
 import pandas as pd
-import librosa
 
 def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
@@ -27,26 +26,3 @@ def dataset_from_csv(csv_path, **kwargs):
 
     dataset = tf.data.Dataset.from_tensor_slices({key:df[key].values for key in df })
     return dataset
-
-def audio_pipeline(filename):
-    audio, _ = librosa.load(filename)
-    features = []
-
-    # Calcul du ZCR
-    zcr = librosa.zero_crossings(audio)
-    features.append(sum(zcr))
-
-    # Calcul de la moyenne du Spectral centroid
-    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-    features.append(np.mean(spectral_centroids))
-  
-    # Calcul du spectral rolloff point
-    rolloff = librosa.feature.spectral_rolloff(audio)[0]
-    features.append(np.mean(rolloff))
-
-    # Calcul des moyennes des MFCC
-    mfcc = librosa.feature.mfcc(audio)
-    for x in mfcc:
-        features.append(np.mean(x))
-
-    return features
