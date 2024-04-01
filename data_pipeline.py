@@ -17,7 +17,8 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
     
     # Use the new function to load and preprocess audio
-    dataset = dataset.map(lambda sample: dict(sample, waveform, mfccs, spectrogram=load_and_preprocess_audio(sample["filename"])))
+    waveform, mfccs, spectrogram=load_and_preprocess_audio(sample["filename"])
+    dataset = dataset.map(lambda sample: dict(sample, waveform, mfccs, spectrogram))
     
     # Filter out badly shaped waveforms
     dataset = dataset.filter(lambda sample: check_valid(sample))
