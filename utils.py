@@ -2,7 +2,7 @@
     Utility functions for data processing
 """
 import tensorflow as tf
-import tf.signal
+import tensorflow.signal
 import pandas as pd
 
 def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
