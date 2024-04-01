@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 import librosa
+from sklearn.model_selection import train_test_split
 
 from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
@@ -36,13 +37,7 @@ def get_dataset(input_csv, batch_size=8):
 
     return dataset
 
-
-# test dataset data generation
-if __name__=="__main__":
-
-    dataset = get_dataset("fma_small.csv")
-    batch = dataset.make_one_shot_iterator().get_next()
-
+def test (label_list):
     mel_specs = []
 
     for l in label_list:
@@ -68,14 +63,22 @@ if __name__=="__main__":
         y_cnn += 100*[i] # On a 100 images pour chaque genre
 
     y_cnn = np.array(y_cnn)
+    y_cnn = to_categorical(y_cnn)
 
+    x_cnn_train, x_cnn_test, y_cnn_train, y_cnn_test = train_test_split(X, y_cnn)
     x_cnn_train /= -80
     x_cnn_test /= -80
 
     x_cnn_train = x_cnn_train.reshape(x_cnn_train.shape[0], 128, 660, 1)
     x_cnn_test = x_cnn_test.reshape(x_cnn_test.shape[0], 128, 660, 1)
+    return (x_cnn_train, x_cnn_test, y_cnn_train, y_cnn_test)
 
-    
+# test dataset data generation
+if __name__=="__main__":
+
+    dataset = get_dataset("fma_small.csv")
+    batch = dataset.make_one_shot_iterator().get_next()
+
 
     with tf.Session() as sess:
 
@@ -83,7 +86,8 @@ if __name__=="__main__":
         batch_value = sess.run(batch)
         print("Training dataset generated a batch with:")
         for el in batch_value:
-            print(x_cnn_train.shape)
-            print(y_cnn_train.shape)
+            print (el)
+            #print(x_cnn_train.shape)
+            #print(y_cnn_train.shape)
             print(f"A {type(el)} with shape {el.shape}.")
             
