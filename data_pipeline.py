@@ -17,18 +17,14 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
     
     # Use the new function to load and preprocess audio
-    waveform, mfccs, spectrogram=load_and_preprocess_audio(sample["filename"])
-    dataset = dataset.map(lambda sample: dict(sample, waveform, mfccs, spectrogram))
+    dataset = dataset.map(lambda sample: (load_and_preprocess_audio(sample["filename"])))
     
-    # Filter out badly shaped waveforms
-    dataset = dataset.filter(lambda sample: check_valid(sample))
+    # Filter out badly shaped waveforms if necessary (make sure to define check_valid)
+    # dataset = dataset.filter(lambda sample: check_valid(sample))
     
     # Encode labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
-    
-    # Select relevant features
-    dataset = dataset.map(lambda sample: (sample["waveform"], sample["mfccs"], sample["spectrogram"], sample["one_hot_label"]))
+    dataset = dataset.map(lambda waveform, mfccs, spectrogram, genre: (waveform, mfccs, spectrogram, one_hot_label(genre, tf.constant(label_list))))
     
     # Create batches
     dataset = dataset.batch(batch_size)
