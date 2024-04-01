@@ -5,7 +5,7 @@ The easiest way to run the code in this repository is to build the provided Dock
 First, you need to install [Docker](https://docs.docker.com/install/).
 Then clone this project:
 ```sh
-git clone https://github.com/romi1502/genre_classification_ensea_project.git
+git clone https://github.com/AntoninLngt/genre_classification.git
 ```
 Then change to the directory of the repo and build the image :
 ```sh
