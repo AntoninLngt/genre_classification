@@ -5,12 +5,14 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import pandas as pd
 
-def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
+def load_audio_waveform(filename_tf, format="mp3", fs=44100):
     """
         load waveform with tensorflow
     """
     audio_binary = tf.io.read_file(filename_tf)
     waveform, _ = tf.audio.decode_wav(audio_binary)
+    # Normalization
+    waveform = waveform / tf.reduce_max(tf.abs(waveform))
     return waveform
 
 def one_hot_label(label_string_tf, label_list_tf, dtype=tf.float32):
@@ -29,16 +31,13 @@ def dataset_from_csv(csv_path, **kwargs):
     dataset = tf.data.Dataset.from_tensor_slices({key:df[key].values for key in df })
     return dataset
 
-def load_and_preprocess_audio(filename):
-    """Load an audio file and apply preprocessing."""
+def mfccs(filename):
+    """
+    Load an audio file, compute log mel spectrogram, and then compute MFCCs.
+    """
     waveform = load_audio_waveform(filename)
-    
-    # Normalization
-    waveform = waveform / tf.reduce_max(tf.abs(waveform))
-    
     # Compute spectrogram
     spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
-    
     # Compute log mel spectrogram
     mel_spectrogram = tf.signal.linear_to_mel_weight_matrix(
         num_mel_bins=40, 
@@ -47,27 +46,20 @@ def load_and_preprocess_audio(filename):
         lower_edge_hertz=20.0, 
         upper_edge_hertz=8000.0
     )
-    
-    # Transpose the mel_spectrogram
     mel_spectrogram = tf.transpose(mel_spectrogram)
-    
-    # Compute the range tensor
     range_tensor = tf.cast(tf.range(1, tf.shape(spectrogram)[-1] + 1), tf.float32)
-    
-    # Reshape the range tensor to match the dimensions of mel_spectrogram
     range_tensor = tf.reshape(range_tensor, [1, -1])
-    
-    # Perform element-wise multiplication
     mel_spectrogram *= range_tensor
-    
-    # Compute log mel spectrogram
     mel_spectrogram = tf.tensordot(spectrogram, mel_spectrogram, 1)
     log_mel_spectrogram = tf.math.log(mel_spectrogram + 1e-6)
-    
-    # Compute MFCCs from log mel spectrogram using tensorflow_addons
-    mfccs = tf.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
-    
-    # Compute spectrogram
+    # Compute MFCCs from log mel spectrogram
+    mfccs = tfa.audio.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
+    return mfccs
+
+def spectrogram(filename):
+    """
+    Compute spectrogram from the audio file.
+    """
+    waveform = load_audio_waveform(filename)
     spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
-    
-    return waveform, mfccs, spectrogram
+    return spectrogram
