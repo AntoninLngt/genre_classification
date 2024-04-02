@@ -35,8 +35,14 @@ def load_and_preprocess_audio(filename):
     # Normalization
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
     
-    # Compute MFCCs
-    mfccs = tf.signal.mfccs_from_log_mel_spectrograms(tf.math.log(tf.abs(tf.signal.stft(waveform))), 44100)
+    # Compute log mel spectrogram
+    mel_spectrogram = tf.signal.linear_to_mel_weight_matrix(num_mel_bins=40, num_spectrogram_bins=tf.shape(spectrogram)[-1], sample_rate=44100, lower_edge_hertz=20.0, upper_edge_hertz=8000.0)
+    mel_spectrogram *= tf.expand_dims(tf.cast(tf.range(1, tf.shape(spectrogram)[-1] + 1), tf.float32), 0)
+    mel_spectrogram = tf.tensordot(spectrogram, mel_spectrogram, 1)
+    log_mel_spectrogram = tf.math.log(mel_spectrogram + 1e-6)
+    
+    # Compute MFCCs from log mel spectrogram using tensorflow_addons
+    mfccs = tfa.audio.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
     
     # Compute spectrogram
     spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
