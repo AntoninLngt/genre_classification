@@ -35,9 +35,9 @@ def load_and_preprocess_audio(filename):
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
     
     # Compute MFCCs
-    mfccs = tf.signal.mfccs_from_log_mel_spectrogram(tf.math.log(tf.abs(tf.signal.stft(waveform))), 44100)
+    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrogram(tf.math.log(tf.abs(tf.contrib.signal.stft(waveform))), 44100)
     
     # Compute spectrogram
-    spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
+    spectrogram = tf.abs(tf.contrib.signal.stft(waveform, frame_length=1024, frame_step=512))
     
     return waveform, mfccs, spectrogram
