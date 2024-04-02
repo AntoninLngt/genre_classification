@@ -38,9 +38,11 @@ if __name__=="__main__":
     batch = dataset.make_one_shot_iterator().get_next()
 
     with tf.Session() as sess:
-
-        # Evaluate first batch
-        batch_value = sess.run(batch)
-        print("Training dataset generated a batch with:")
-        for el in batch_value:
-            print(f"A {type(el)} with shape {el.shape}.")
+        try:
+            # Evaluate first batch
+            batch_value = sess.run(iterator.get_next())
+            print("Training dataset generated a batch with:")
+            for el in batch_value:
+                print(f"A {type(el)} with shape {el.shape}.")
+        except tf.errors.OutOfRangeError:
+            print("End of dataset reached.")
