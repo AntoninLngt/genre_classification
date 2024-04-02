@@ -9,18 +9,10 @@ import pandas as pd
 
 def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
-    Load waveform with Librosa.
+        load waveform with tensorflow
     """
-    # Convert the tensor to a string using tf.strings.as_string
-    filename_str = filename_tf.numpy().decode('utf-8')
-    
-    # Load audio file
-    waveform, fs = librosa.load(filename_str.numpy().decode('utf-8'), sr=fs)
-    
-    # Normalize waveform
-    waveform = waveform / max(abs(waveform))
-    
-    return waveform
+    audio_binary = tf.read_file(filename_tf)
+    return tf.ffmpeg.decode_audio(audio_binary, file_format=format, samples_per_second=fs, channel_count=channel_count)
 
 
 def one_hot_label(label_string_tf, label_list_tf, dtype=tf.float32):
