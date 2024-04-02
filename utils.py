@@ -3,6 +3,7 @@
 """
 import tensorflow as tf
 import tensorflow_addons as tfa
+import tensorflow_io as tfio
 import pandas as pd
 
 
