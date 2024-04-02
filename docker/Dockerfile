@@ -10,12 +10,14 @@ RUN cd /data && wget https://os.unil.cloud.switch.ch/fma/fma_small.zip -O fma_sm
 # install tensorflow
 RUN conda install -c anaconda tensorflow==2.12
 RUN pip install tensorflow-addons==0.15.0
-RUN pip install tensorflow-io
+
 # install pandas
 RUN conda install -y -c anaconda pandas
 
 # install ffmpeg (for loading mp3 files)
 RUN conda install -y ffmpeg
+
+RUN pip install librosa
 
 # clone git repo of the project
 RUN mkdir /workspace/ && cd /workspace/ && git clone https://github.com/AntoninLngt/genre_classification.git

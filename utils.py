@@ -3,18 +3,20 @@
 """
 import tensorflow as tf
 import tensorflow_addons as tfa
-import tensorflow_io as tfio
+import librosa
 import pandas as pd
 
 
-def load_audio_waveform(filename_tf):
+def load_audio_waveform(filename_tf, fs=44100):
     """
-    Load waveform from an MP3 file using TensorFlow I/O.
+    Load waveform with Librosa.
     """
-    audio_binary = tf.io.read_file(filename_tf)
-    waveform = tfio.audio.decode_mp3(audio_binary)
+    # Load audio file
+    waveform, fs = librosa.load(filename_tf, sr=fs)
+    
     # Normalize waveform
-    waveform = waveform / tf.reduce_max(tf.abs(waveform))
+    waveform = waveform / max(abs(waveform))
+    
     return waveform
 
 
