@@ -11,11 +11,16 @@ def load_audio_waveform(filename_tf, fs=44100):
     """
     Load waveform with Librosa.
     """
-    # Load audio file
-    waveform, fs = librosa.load(filename_tf, sr=fs)
+    # Define a Python function to extract the string value from the TensorFlow tensor
+    def load_waveform(filename):
+        filename_str = filename.numpy().decode('utf-8')  # Extract string value
+        waveform, fs = librosa.load(filename_str, sr=fs)  # Load audio file
+        waveform = waveform / max(abs(waveform))  # Normalize waveform
+        return waveform
     
-    # Normalize waveform
-    waveform = waveform / max(abs(waveform))
+    # Use tf.py_function to apply the Python function to each element of the tensor
+    waveform = tf.py_function(load_waveform, [filename_tf], tf.float32)
+    
     
     return waveform
 
