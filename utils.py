@@ -7,20 +7,13 @@ import librosa
 import pandas as pd
 
 
-def load_audio_waveform(filename_tf, fs=44100):
+def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
-    Load waveform with Librosa.
+        load waveform with tensorflow
     """
-    # Define a Python function to extract the string value from the TensorFlow tensor
-    def load_waveform(filename):
-        filename_str = filename.numpy().decode('utf-8')  # Extract string value
-        waveform, sr = librosa.load(filename_str, sr=fs)  # Load audio file
-        waveform = waveform / max(abs(waveform))  # Normalize waveform
-        return waveform, sr
-    
-    # Use tf.py_function to apply the Python function to each element of the tensor
-    waveform, sr = tf.py_function(load_waveform, [filename_tf], (tf.float32, tf.int32))
-    return waveform
+    audio_binary = librosa.load(filename_tf)
+    return tf.ffmpeg.decode_audio(audio_binary, file_format=format, samples_per_second=fs, channel_count=channel_count)
+
 
 def one_hot_label(label_string_tf, label_list_tf, dtype=tf.float32):
     """
