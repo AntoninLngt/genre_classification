@@ -35,7 +35,10 @@ def load_and_preprocess_audio(filename):
     # Normalization
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
     
-   # Compute log mel spectrogram
+    # Compute spectrogram
+    spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
+
+    # Compute log mel spectrogram
     mel_spectrogram = tf.signal.linear_to_mel_weight_matrix(
         num_mel_bins=40, 
         num_spectrogram_bins=tf.shape(spectrogram)[-1], 
