@@ -4,7 +4,6 @@
 import os
 import argparse
 import tensorflow as tf
-from tensorflow.contrib.training import HParams
 
 from keras_model import build_model
 from data_pipeline import get_dataset
@@ -21,7 +20,7 @@ def process_arguments():
                         help="Number of epochs",
                         dest='epochs', type=int, default=10)
 
-    return HParams(**parser.parse_args().__dict__)
+    return tf.keras.utils.HParams(**parser.parse_args().__dict__)
 
 
 if __name__=="__main__":
