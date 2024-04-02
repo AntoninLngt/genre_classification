@@ -65,7 +65,7 @@ def load_and_preprocess_audio(filename):
     log_mel_spectrogram = tf.math.log(mel_spectrogram + 1e-6)
     
     # Compute MFCCs from log mel spectrogram using tensorflow_addons
-    mfccs = tfa.audio.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
+    mfccs = tf.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
     
     # Compute spectrogram
     spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
