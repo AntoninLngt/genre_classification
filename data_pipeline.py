@@ -14,7 +14,7 @@ DATASET_DIR = "/data/fma_small/"
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
     dataset = dataset_from_csv(input_csv)
-    dataset = dataset.map(lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
+    dataset = dataset.map(lambda sample: dict(sample, filename=tf.string.join([DATASET_DIR, sample["filename"]])))
     
     # Use the new function to load and preprocess audio
     dataset = dataset.map(lambda sample: (load_and_preprocess_audio(sample["filename"])))
