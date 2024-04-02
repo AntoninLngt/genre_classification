@@ -12,7 +12,7 @@ def load_audio_waveform(filename_tf):
     Load waveform from an MP3 file using TensorFlow I/O.
     """
     audio_binary = tf.io.read_file(filename_tf)
-    waveform = tfio.audio.decode_mp3(audio_binary, desired_channels=1)  # Ensure mono channel
+    waveform = tfio.audio.decode_mp3(audio_binary)
     # Normalize waveform
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
     return waveform
