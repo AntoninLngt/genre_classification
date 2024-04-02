@@ -35,8 +35,14 @@ def load_and_preprocess_audio(filename):
     # Normalization
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
     
-    # Compute log mel spectrogram
-    mel_spectrogram = tf.signal.linear_to_mel_weight_matrix(num_mel_bins=40, num_spectrogram_bins=tf.shape(spectrogram)[-1], sample_rate=44100, lower_edge_hertz=20.0, upper_edge_hertz=8000.0)
+   # Compute log mel spectrogram
+    mel_spectrogram = tf.signal.linear_to_mel_weight_matrix(
+        num_mel_bins=40, 
+        num_spectrogram_bins=tf.shape(spectrogram)[-1], 
+        sample_rate=44100, 
+        lower_edge_hertz=20.0, 
+        upper_edge_hertz=8000.0
+    )
     mel_spectrogram *= tf.expand_dims(tf.cast(tf.range(1, tf.shape(spectrogram)[-1] + 1), tf.float32), 0)
     mel_spectrogram = tf.tensordot(spectrogram, mel_spectrogram, 1)
     log_mel_spectrogram = tf.math.log(mel_spectrogram + 1e-6)
