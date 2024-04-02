@@ -8,9 +8,10 @@ def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
         load waveform with tensorflow
     """
-    audio_binary = tf.read_file(filename_tf)
-    return tf.contrib.ffmpeg.decode_audio(audio_binary, file_format=format, samples_per_second=fs, channel_count=channel_count)
-
+    audio_binary = tf.io.read_file(filename)
+    waveform, _ = tf.audio.decode_wav(audio_binary)
+    return waveform
+    
 def one_hot_label(label_string_tf, label_list_tf, dtype=tf.float32):
     """
         Transform string label to one hot vector.
@@ -35,9 +36,9 @@ def load_and_preprocess_audio(filename):
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
     
     # Compute MFCCs
-    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrogram(tf.math.log(tf.abs(tf.contrib.signal.stft(waveform))), 44100)
+    mfccs = tfsignal.mfccs_from_log_mel_spectrogram(tf.math.log(tf.abs(tfsignal.stft(waveform))), 44100)
     
     # Compute spectrogram
-    spectrogram = tf.abs(tf.contrib.signal.stft(waveform, frame_length=1024, frame_step=512))
+    spectrogram = tf.abs(tf.signal.stft(waveform, frame_length=1024, frame_step=512))
     
     return waveform, mfccs, spectrogram
