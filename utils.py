@@ -52,8 +52,8 @@ def mfccs(filename):
     mel_spectrogram *= range_tensor
     mel_spectrogram = tf.tensordot(spectrogram, mel_spectrogram, 1)
     log_mel_spectrogram = tf.math.log(mel_spectrogram + 1e-6)
-    # Compute MFCCs from log mel spectrogram
-    mfccs = tfa.audio.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
+    # Compute MFCCs from log mel spectrogram using TensorFlow signal module
+    mfccs = tf.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
     return mfccs
 
 def spectrogram(filename):
