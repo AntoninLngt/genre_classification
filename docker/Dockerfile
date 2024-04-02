@@ -19,6 +19,8 @@ RUN conda install -y ffmpeg
 
 RUN pip install librosa
 
+RUN apt-get install libffi-dev
+
 # clone git repo of the project
 RUN mkdir /workspace/ && cd /workspace/ && git clone https://github.com/AntoninLngt/genre_classification.git
 WORKDIR /workspace/genre_classification
