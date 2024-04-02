@@ -5,15 +5,13 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import pandas as pd
 
-def load_audio_waveform(filename_tf, format="mp3", fs=44100):
+def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
         load waveform with tensorflow
     """
-    audio_binary = tf.io.read_file(filename_tf)
-    waveform, _ = tf.audio.decode_wav(audio_binary)
-    # Normalization
-    waveform = waveform / tf.reduce_max(tf.abs(waveform))
-    return waveform
+    audio_binary = tf.read_file(filename_tf)
+    return tf.contrib.ffmpeg.decode_audio(audio_binary, file_format=format, samples_per_second=fs, channel_count=channel_count)
+
 
 def one_hot_label(label_string_tf, label_list_tf, dtype=tf.float32):
     """
