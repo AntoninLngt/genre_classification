@@ -8,10 +8,10 @@ def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
         load waveform with tensorflow
     """
-    audio_binary = tf.io.read_file(filename)
+    audio_binary = tf.io.read_file(filename_tf)
     waveform, _ = tf.audio.decode_wav(audio_binary)
     return waveform
-    
+
 def one_hot_label(label_string_tf, label_list_tf, dtype=tf.float32):
     """
         Transform string label to one hot vector.
