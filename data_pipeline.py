@@ -24,7 +24,7 @@ def get_dataset(input_csv, batch_size=8):
     
     # Encode labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map(lambda waveform, mfccs, spectrogram, genre, filename=filename: (waveform, mfccs, spectrogram, one_hot_label(genre, tf.constant(label_list))))
+    dataset = dataset.map(lambda waveform, mfccs, spectrogram, genre, (waveform, mfccs, spectrogram, one_hot_label(genre, tf.constant(label_list))))
     
     # Create batches
     dataset = dataset.batch(batch_size)
