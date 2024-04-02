@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y p7zip-full
 RUN cd /data && wget https://os.unil.cloud.switch.ch/fma/fma_small.zip -O fma_small.zip && 7z x fma_small.zip && rm fma_small.zip
 
 # install tensorflow
-RUN conda install -c anaconda tensorflow==1.12
+RUN conda install -c anaconda tensorflow==1.14
 
 # install pandas
 RUN conda install -y -c anaconda pandas
