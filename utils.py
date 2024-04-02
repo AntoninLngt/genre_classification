@@ -11,7 +11,7 @@ def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     """
         load waveform with tensorflow
     """
-    audio_binary = tf.read_file(filename_tf)
+    audio_binary = librosa.load(filename_tf)
     return tf.ffmpeg.decode_audio(audio_binary, file_format=format, samples_per_second=fs, channel_count=channel_count)
 
 
