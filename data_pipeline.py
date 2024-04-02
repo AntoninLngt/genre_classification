@@ -16,6 +16,7 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset_from_csv(input_csv)
     dataset = dataset.map(lambda sample: dict(sample, filename=tf.strings.join([DATASET_DIR, sample["filename"]])))
     
+
     # Encode labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
     dataset = dataset.map(lambda sample: {
@@ -24,6 +25,9 @@ def get_dataset(input_csv, batch_size=8):
         'spectrogram': load_and_preprocess_audio(sample["filename"])[2],
         'one_hot_label': one_hot_label(sample["genre"], tf.constant(label_list))
     })
+
+    # Select only features and annotation
+    dataset = dataset.map(lambda sample: (sample["waveform"],sample["mfccs"],sample["spectrogram"], sample["one_hot_label"]))
     # Create batches
     dataset = dataset.batch(batch_size)
     
