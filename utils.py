@@ -6,7 +6,7 @@ import tensorflow_addons as tfa
 import pandas as pd
 
 
-def load_audio_mp3(filename_tf):
+def load_audio_waveform(filename_tf):
     """
     Load waveform from an MP3 file using TensorFlow I/O.
     """
