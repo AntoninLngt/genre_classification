@@ -20,6 +20,7 @@ RUN conda install -y ffmpeg
 RUN pip install librosa
 
 RUN apt-get install libffi-dev
+RUN ln -s /usr/lib/x86_64-linux-gnu/libffi.so.6 /usr/lib/x86_64-linux-gnu/libffi.so.7
 
 # clone git repo of the project
 RUN mkdir /workspace/ && cd /workspace/ && git clone https://github.com/AntoninLngt/genre_classification.git
