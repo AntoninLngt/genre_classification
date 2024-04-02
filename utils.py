@@ -12,10 +12,10 @@ def load_audio_waveform(filename_tf, format="mp3", fs=44100, channel_count=2):
     Load waveform with Librosa.
     """
     # Convert the tensor to a string using tf.strings.as_string
-    filename_str = tf.strings.decode(filename_tf, 'utf-8')
+    filename_str = tf.strings.as_string(filename_tf)
     
     # Load audio file
-    waveform, fs = librosa.load(filename_str, sr=fs)
+    waveform, fs = librosa.load(filename_str.numpy().decode('utf-8'), sr=fs)
     
     # Normalize waveform
     waveform = waveform / max(abs(waveform))
