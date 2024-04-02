@@ -10,6 +10,7 @@ RUN cd /data && wget https://os.unil.cloud.switch.ch/fma/fma_small.zip -O fma_sm
 # install tensorflow
 RUN conda install -c anaconda tensorflow==2.12
 RUN pip install tensorflow-addons==0.15.0
+RUN pip install tensorflow-io
 # install pandas
 RUN conda install -y -c anaconda pandas
 

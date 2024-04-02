@@ -5,19 +5,15 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import pandas as pd
 
-def load_audio_waveform(filename_tf, fs=44100):
+
+def load_audio_mp3(filename_tf):
     """
-    Load waveform with TensorFlow.
+    Load waveform from an MP3 file using TensorFlow I/O.
     """
-    # Read audio file
     audio_binary = tf.io.read_file(filename_tf)
-    
-    # Decode WAV audio
-    waveform, _ = tf.audio.decode_mp3(audio_binary)
-    
+    waveform = tfio.audio.decode_mp3(audio_binary, desired_channels=1)  # Ensure mono channel
     # Normalize waveform
     waveform = waveform / tf.reduce_max(tf.abs(waveform))
-    
     return waveform
 
 
