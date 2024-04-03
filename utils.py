@@ -2,7 +2,6 @@
     Utility functions for data processing
 """
 import tensorflow as tf
-import librosa
 import pandas as pd
 
 

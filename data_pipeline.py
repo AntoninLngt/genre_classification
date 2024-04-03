@@ -6,6 +6,7 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import librosa
 
 from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
