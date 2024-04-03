@@ -16,7 +16,7 @@ def audio_pipeline(audio):
     features = []
 
     # Evaluate the TensorFlow tensor within a TensorFlow session
-    with tf.compat.v1.Session() as sess:
+    with tf.Session() as sess:
         audio_np = sess.run(audio)
 
     # Calcul du ZCR
