@@ -30,4 +30,5 @@ if __name__=="__main__":
     params = process_arguments()
     model = build_model()
     dataset = get_dataset("fma_small.csv")
-    model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
+    print(dataset)
+    #model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
