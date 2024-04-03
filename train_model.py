@@ -28,7 +28,6 @@ if __name__=="__main__":
 
     # get arguments from command line
     params = process_arguments()
-    with tf.Graph().as_default():
-        model = build_model()
-        dataset = get_dataset("fma_small.csv")
-        model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
+    model = build_model()
+    dataset = get_dataset("fma_small.csv")
+    model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
