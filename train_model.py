@@ -33,9 +33,9 @@ if __name__=="__main__":
     model = build_model()
     dataset = get_dataset("fma_small.csv")
 
-    features = df[["waveform","one_hot_label",'zcr', 'centroid', 'mfcc']]
+    features = dataset[["waveform","one_hot_label",'zcr', 'centroid', 'mfcc']]
 
-    labels = df["genre"]
+    labels = dataset["genre"]
 
     train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size = 0.25, random_state = 0)
 
