@@ -21,19 +21,19 @@ def get_features_from_waveform(sample_waveform):
         # Calcul de la moyenne du Spectral centroid
 
         spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-        features.append(tf.np(spectral_centroids))
+        features.append(np.mean(spectral_centroids))
         
         # Calcul du spectral rolloff point
 
         rolloff = librosa.feature.spectral_rolloff(audio)
-        features.append(tf.np(rolloff))
+        features.append(np.mean(rolloff))
 
         # Calcul des moyennes des MFCC
 
         mfcc = librosa.feature.mfcc(audio)
 
         for x in mfcc:
-            features.append(ft.np(x))
+            features.append(np.mean(x))
         return tf.cast(features, tf.float32)
 
     features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
