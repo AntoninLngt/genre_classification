@@ -112,3 +112,4 @@ if __name__=="__main__":
         print("One-hot labels:", one_hot_labels)
         print("Filenames:", filenames)
         print("ZCR data:", zcr_data)
+        break
