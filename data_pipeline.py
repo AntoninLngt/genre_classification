@@ -12,30 +12,28 @@ from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
 def audio_pipeline(audio):
-    def compute_features(audio_frame):
-        features = []
+    # Compute zero crossings
+    zcr = tf.cast(tf.abs(tf.sign(audio[:, :-1] * audio[:, 1:])), tf.float32)
+    zcr = tf.reduce_sum(zcr, axis=-1)
 
-        # Compute zero crossings
-        zcr = tf.py_func(librosa.zero_crossings, [audio_frame], tf.bool)
-        features.append(tf.reduce_sum(tf.cast(zcr, tf.float32)))
+    # Compute spectral centroid
+    stft = tf.abs(tf.contrib.signal.stft(tf.cast(audio, tf.float32), frame_length=2048, frame_step=512, fft_length=2048))
+    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=22050, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
+    spectral_centroids = tf.tensordot(stft, frequencies, 1)
+    spectral_centroids = tf.reduce_sum(spectral_centroids, axis=1)
+    spectral_centroids /= tf.reduce_sum(stft, axis=1)
 
-        # Compute spectral centroid
-        spectral_centroids = tf.py_func(librosa.feature.spectral_centroid, [audio_frame], tf.float32)[0]
-        features.append(tf.reduce_mean(spectral_centroids))
+    # Compute spectral rolloff
+    cumsum = tf.cumsum(stft, axis=1)
+    total_energy = tf.reduce_sum(stft, axis=1)
+    rolloff = tf.argmax(tf.where(cumsum >= 0.85 * total_energy[:, None], True, False), axis=1)
 
-        # Compute spectral rolloff
-        rolloff = tf.py_func(librosa.feature.spectral_rolloff, [audio_frame], tf.float32)[0]
-        features.append(tf.reduce_mean(rolloff))
+    # Compute MFCCs
+    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(tf.math.log(stft + 1e-6))
+    mfccs = tf.reduce_mean(mfccs, axis=1)
 
-        # Compute MFCCs
-        mfccs = tf.py_func(librosa.feature.mfcc, [audio_frame], tf.float32)
-        for mfcc in mfccs:
-            features.append(tf.reduce_mean(mfcc))
-
-        return features
-
-    # Apply compute_features to each frame in the audio
-    features = tf.map_fn(compute_features, audio, dtype=tf.float32)
+    # Stack all features
+    features = tf.stack([zcr, spectral_centroids, tf.cast(rolloff, tf.float32)] + [mfccs], axis=1)
 
     return features
 
