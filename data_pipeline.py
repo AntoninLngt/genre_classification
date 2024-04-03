@@ -59,7 +59,7 @@ def audio_pipeline(audio, fs=44100):
     # Compute MFCCs from the log Mel spectrogram
     mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(
         log_mel_spectrogram,
-        num_mfccs=20
+       dct_coefficient_count=20
     )
 
 
