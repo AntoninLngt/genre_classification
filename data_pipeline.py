@@ -30,13 +30,13 @@ def get_features_from_waveform(sample_waveform):
         # Calcul des moyennes des MFCC
         mfcc = librosa.feature.mfcc(audio)
         mfcc = np.transpose(mfcc)  # Transpose MFCC coefficients
-        print("MFCC shape after transpose:", mfcc.shape)  # Debugging print
         for x in mfcc:
             features.append(np.mean(x))
 
         return features
 
     features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
+    features.set_shape((None,))  # Set the shape of the output tensor
     return features
 
 def get_dataset(input_csv, batch_size=8):
