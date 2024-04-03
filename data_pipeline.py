@@ -16,13 +16,14 @@ def audio_pipeline(audio):
     zcr = tf.cast(tf.abs(tf.sign(audio[:, :-1] * audio[:, 1:])), tf.float32)
     zcr = tf.reduce_sum(zcr, axis=-1)
 
-    # Compute spectral centroid
-    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=22050, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
-    spectral_centroids = tf.tensordot(stft, frequencies, 1)
-    spectral_centroids = tf.reduce_sum(spectral_centroids, axis=1)
-    spectral_centroids = tf.expand_dims(spectral_centroids, axis=1)  # Add a new axis
-    spectral_centroids = tf.tile(spectral_centroids, [1, tf.shape(stft)[1]])  # Tile to match the shape of stft
+    # Compute STFT of the audio waveform
+    stft = tf.signal.stft(audio_frame, frame_length=frame_length, frame_step=frame_step, fft_length=fft_length)
 
+    # Compute spectral centroid
+    magnitude_spectrum = tf.abs(stft)
+    frequencies = tf.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=sample_rate, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
+    spectral_centroids = tf.tensordot(magnitude_spectrum, frequencies, 1)
+    spectral_centroids = tf.reduce_sum(spectral_centroids, axis=1)
     # Compute spectral rolloff
     cumsum = tf.cumsum(stft, axis=1)
     total_energy = tf.reduce_sum(stft, axis=1)
