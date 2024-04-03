@@ -30,5 +30,20 @@ if __name__=="__main__":
     params = process_arguments()
     model = build_model()
     dataset = get_dataset("fma_small.csv")
-    print(dataset)
+    for batch in dataset:
+        waveform_data, one_hot_labels, filenames, zcr_data = batch
+
+        # Convert filenames to string
+        filenames = [filename.decode("utf-8") for filename in filenames.numpy()]
+
+        # Convert numpy arrays to lists
+        waveform_data = waveform_data.numpy().tolist()
+        one_hot_labels = one_hot_labels.numpy().tolist()
+        zcr_data = zcr_data.numpy().tolist()
+
+        # Print batch information
+        print("Waveform data:", waveform_data)
+        print("One-hot labels:", one_hot_labels)
+        print("Filenames:", filenames)
+        print("ZCR data:", zcr_data)
     #model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
