@@ -93,8 +93,23 @@ if __name__=="__main__":
 
     with tf.Session() as sess:
 
-        # Evaluate first batch
-        batch_value = sess.run(batch)
-        print("Training dataset generated a batch with:")
-        for el in batch_value:
-            print(f"{el}:A {type(el)} with shape {el.shape}.")
+        # Counter to track batch index
+        batch_index = 0
+
+        # Iterate over batches
+        while True:
+            try:
+                # Evaluate next batch
+                batch_value = sess.run(batch)
+                print(f"Processing batch {batch_index}")
+
+                # Print batch information
+                for el in batch_value:
+                    print(f"{el}:A {type(el)} with shape {el.shape}.")
+
+                # Increment batch index
+                batch_index += 1
+
+            except tf.errors.OutOfRangeError:
+                # End of dataset
+                break
