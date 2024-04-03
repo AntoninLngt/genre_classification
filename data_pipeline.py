@@ -32,10 +32,10 @@ def get_dataset(input_csv, batch_size=8):
 
     # Extract audio features
     dataset = dataset.map(lambda sample: (sample["filename"], 
-                                          zcr(sample["filename"]), 
-                                          spectral_centroids(sample["filename"]),
-                                          mfcc(sample["filename"]),
-                                          rolloff(sample["filename"]),
+                                          zcr("filename"), 
+                                          spectral_centroids("filename"),
+                                          mfcc("filename"),
+                                          rolloff("filename"),
                                           sample["one_hot_label"]))
 
     # Make batch
