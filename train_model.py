@@ -5,20 +5,24 @@ import os
 import argparse
 import tensorflow as tf
 
+from tensorflow.contrib.training import HParams
+
 from keras_model import build_model
 from data_pipeline import get_dataset
 
 
 def process_arguments():
+
     parser = argparse.ArgumentParser()
+
     parser.add_argument('--steps_per_epoch',
                         help="Number of steps of gradient descent per epoch",
                         dest='steps_per_epoch', type=int, default=10)
     parser.add_argument('--epochs',
                         help="Number of epochs",
                         dest='epochs', type=int, default=10)
-    args = parser.parse_args()
-    return vars(args)
+
+    return HParams(**parser.parse_args().__dict__)
 
 
 if __name__=="__main__":
