@@ -63,19 +63,17 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample, :]), num_parallel_calls=32)
 
     dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample, 2))))
- 
+
+    label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
+    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
+    
     dataset = dataset.map(lambda sample: dict(sample, zcr=zcr(sample["waveform"])))
 
     dataset = dataset.map(lambda sample: dict(sample, centroid=centroid(sample["waveform"])))
 
     dataset = dataset.map(lambda sample: dict(sample, mfcc=mfcc(sample["waveform"][:, 0])))
-
-
-    label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
-
     # Select only features and annotation
-    dataset = dataset.map(lambda sample: (sample["waveform"],sample["zcr"],sample["centroid"],sample["mfcc"][:, 0], sample["one_hot_label"]))
+    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"],sample["zcr"],sample["centroid"],sample["mfcc"][:, 0]))
 
     dataset = dataset.batch(batch_size)
     return dataset
