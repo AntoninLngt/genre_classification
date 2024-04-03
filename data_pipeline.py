@@ -52,7 +52,7 @@ def audio_pipeline(audio, fs=44100):
     mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
     features.append(mfccs)
 
-    return tf.concat(features, axis=1)
+    return features
 
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
