@@ -11,7 +11,7 @@ import librosa
 from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
-def audio_pipeline(audio):
+def get_features_from_waveform(audio):
     features = []
 
     # Calcul du ZCR
