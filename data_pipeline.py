@@ -46,7 +46,7 @@ def audio_pipeline(audio, fs=44100):
     index = tf.argmax(tf.cast(cumulative_sum >= threshold, tf.int32), axis=1)
 
     # Compute the spectral rolloff frequency
-    rolloff_freq = tf.gather_nd(tf.contrib.signal.linear_to_mel_weight_matrix(1, 256, fs)[0], tf.expand_dims(index, axis=1))
+    rolloff_freq = tf.gather_nd(frequencies, tf.expand_dims(index, axis=1))
 
     mel_spectrogram = tf.contrib.signal.mel_spectrogram(
         audio,
