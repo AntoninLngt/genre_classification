@@ -67,14 +67,14 @@ def get_dataset(input_csv, batch_size=8):
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
     
-    #dataset = dataset.map(lambda sample: dict(sample, zcr=zcr(sample["waveform"])))
+    dataset = dataset.map(lambda sample: dict(sample, zcr=zcr(sample["waveform"])))
 
     #dataset = dataset.map(lambda sample: dict(sample, centroid=centroid(sample["waveform"])))
 
     #dataset = dataset.map(lambda sample: dict(sample, mfcc=mfcc(sample["waveform"][:, 0])))
     # Select only features and annotation
-    #,sample["zcr"],sample["centroid"],sample["mfcc"][:, 0]
-    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"]))
+    #,sample["centroid"],sample["mfcc"][:, 0]
+    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"],sample["zcr"]))
 
     dataset = dataset.batch(batch_size)
     return dataset
