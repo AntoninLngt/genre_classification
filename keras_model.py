@@ -5,7 +5,7 @@ from tensorflow.keras.optimizers import SGD
 def build_model():
     model = Sequential(
         [
-            Dense(128, input_dim=23, activation='relu'),
+            Dense(128, input_dim=11025 * 2, activation='relu'),
             Dense(10,activation="softmax")
         ]
     )
