@@ -6,7 +6,6 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-tf.enable_eager_execution()
 
 import librosa
 
@@ -16,25 +15,24 @@ DATASET_DIR = "/data/fma_small/"
 def get_features_from_waveform(audio):
     features = []
     # Convert TensorFlow tensor to NumPy array
-    audio_np = audio.numpy()
 
     # Zero Crossing Rate
-    zcr = librosa.zero_crossings(audio_np)
-    features.append(np.sum(zcr))
+    zcr = librosa.zero_crossings(audio)
+    features.append(zcr)
 
     # Spectral Centroid
-    spectral_centroids = librosa.feature.spectral_centroid(audio_np)[0]
-    features.append(np.mean(spectral_centroids))
+    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
+    features.append(spectral_centroids)
 
     # Spectral Rolloff
-    rolloff = librosa.feature.spectral_rolloff(audio_np)
-    features.append(np.mean(rolloff))
+    rolloff = librosa.feature.spectral_rolloff(audio)
+    features.append(rolloff)
 
     # MFCCs (Mel-frequency cepstral coefficients)
-    mfcc = librosa.feature.mfcc(audio_np)
+    mfcc = librosa.feature.mfcc(audio_)
 
     for x in mfcc:
-        features.append(np.mean(x))
+        features.append(x)
         
     return tf.cast(features, tf.float32)
 
