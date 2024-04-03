@@ -36,8 +36,8 @@ def get_features_from_waveform(sample_waveform):
             features.append(np.mean(x))
         return features
 
-    features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
-    return tf.cast(features, tf.float32) 
+    features = tf.cast(features, tf.float32) 
+    return features
 
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
