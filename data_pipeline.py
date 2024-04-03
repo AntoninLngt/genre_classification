@@ -86,13 +86,15 @@ def get_dataset(input_csv, batch_size=8):
 
 
 # test dataset data generation
-if __name__ == "__main__":
-    tf.enable_eager_execution()
+if __name__=="__main__":
+
     dataset = get_dataset("fma_small.csv")
-    for batch in dataset:
-        for elem in batch:
-            if isinstance(elem, np.ndarray):
-                if np.isnan(elem).any():
-                    print("Dataset contains NaN values!")
-                    break
-        break  # Check only the first batch
+    batch = dataset.make_one_shot_iterator().get_next()
+
+    with tf.Session() as sess:
+
+        # Evaluate first batch
+        batch_value = sess.run(batch)
+        print("Training dataset generated a batch with:")
+        for el in batch_value:
+            print(f"{el}:A {type(el)} with shape {el.shape}.")
