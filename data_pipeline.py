@@ -17,11 +17,11 @@ def audio_pipeline(audio):
     zcr = tf.reduce_sum(zcr, axis=-1)
 
     # Compute STFT of the audio waveform
-    stft = tf.signal.stft(audio_frame, frame_length=frame_length, frame_step=frame_step, fft_length=fft_length)
+    stft = tf.contrib.signal.stft(audio_frame, frame_length=frame_length, frame_step=frame_step, fft_length=fft_length)
 
     # Compute spectral centroid
     magnitude_spectrum = tf.abs(stft)
-    frequencies = tf.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=sample_rate, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
+    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=sample_rate, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
     spectral_centroids = tf.tensordot(magnitude_spectrum, frequencies, 1)
     spectral_centroids = tf.reduce_sum(spectral_centroids, axis=1)
     # Compute spectral rolloff
