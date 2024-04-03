@@ -87,14 +87,10 @@ if __name__=="__main__":
     dataset = get_dataset("fma_small.csv")
     batch = dataset.make_one_shot_iterator().get_next()
 
-     # Print the dataset contents
-    iterator = dataset.make_one_shot_iterator()
-    next_element = iterator.get_next()
-    
     with tf.Session() as sess:
-        try:
-            while True:
-                batch_value = sess.run(next_element)
-                print(batch_value)
-        except tf.errors.OutOfRangeError:
-            pass  # End of dataset
+
+        # Evaluate first batch
+        batch_value = sess.run(batch)
+        print("Training dataset generated a batch with:")
+        for el in batch_value:
+            print(f"A {type(el)} with shape {el.shape}.")
