@@ -16,7 +16,7 @@ def audio_pipeline(audio):
 
     # Compute zero crossings
     zcr = tf.py_func(librosa.zero_crossings, [audio], tf.bool)
-    features.append(tf.cast(tf.reduce_sum(tf.cast(zcr, tf.float32)), tf.float32))
+    features.append(tf.reduce_sum(zcr))
 
     # Compute spectral centroid
     spectral_centroids = tf.py_func(librosa.feature.spectral_centroid, [audio], tf.float32)[0]
@@ -28,12 +28,8 @@ def audio_pipeline(audio):
 
     # Compute MFCCs
     mfccs = tf.py_func(librosa.feature.mfcc, [audio], tf.float32)
-    
-    def process_mfcc(mfcc):
-        return tf.reduce_mean(mfcc)
-    
-    mfccs_mean = tf.map_fn(process_mfcc, mfccs, dtype=tf.float32)
-    features.extend(mfccs_mean)
+    for mfcc in mfccs:
+        features.append(tf.reduce_mean(mfcc))
 
     return features
 
