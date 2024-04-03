@@ -28,8 +28,12 @@ def audio_pipeline(audio):
 
     # Compute MFCCs
     mfccs = tf.py_func(librosa.feature.mfcc, [audio], tf.float32)
-    for mfcc in mfccs:
-        features.append(tf.reduce_mean(mfcc))
+    
+    def process_mfcc(mfcc):
+        return tf.reduce_mean(mfcc)
+    
+    mfccs_mean = tf.map_fn(process_mfcc, mfccs, dtype=tf.float32)
+    features.extend(mfccs_mean)
 
     return features
 
