@@ -18,7 +18,7 @@ def audio_pipeline(audio):
     def compute_zero_crossings(audio):
         return np.sum(librosa.zero_crossings(audio[:, 0]))
 
-    zcr = tf.py_func(compute_zero_crossings, [audio], tf.float32)
+    zcr = tf.py_func(compute_zero_crossings, [audio], tf.int64)
     features.append(zcr)
 
     # Compute spectral centroid
@@ -43,7 +43,6 @@ def audio_pipeline(audio):
     mfccs = tf.py_func(compute_mfcc, [audio], tf.float32)
     features.extend(mfccs)
 
-    return features
     return features
 
 def get_dataset(input_csv, batch_size=8):
