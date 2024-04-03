@@ -12,20 +12,33 @@ from utils import one_hot_label, load_audio_waveform, dataset_from_csv,mfccs,spe
 DATASET_DIR = "/data/fma_small/"
 
 def get_dataset(input_csv, batch_size=8):
-    """Function to build the dataset."""
+    # build dataset from csv file
     dataset = dataset_from_csv(input_csv)
-    dataset = dataset.map(lambda sample: dict(sample, filename=tf.strings.join([DATASET_DIR, sample["filename"]])))
 
-    n_sample = 11025
-    dataset = dataset.map(lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample, :]), num_parallel_calls=32)
+    # add directory in the filename
+    dataset = dataset.map(lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
 
-    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample, 2))))
+    n_sample = 11025  # Assuming this is the desired sample length
 
+    # load audio and take the first n_sample samples only
+    dataset = dataset.map(lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample,:]), num_parallel_calls=32)
+
+    # Filter out badly shaped waveforms (due to loading errors)
+    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample,2))))
+
+    # one hot encoding of labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
+    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))) )
 
-    dataset = dataset.map(lambda sample: (sample["waveform"], mfccs(sample["filename"]), spectrogram(sample["filename"]), sample["one_hot_label"]))
+    # Extract audio features
+    dataset = dataset.map(lambda sample: (sample["waveform"], 
+                                          zcr(sample["waveform"]), 
+                                          spectral_centroids(sample["waveform"]),
+                                          mfcc(sample["waveform"]),
+                                          rolloff(sample["waveform"]),
+                                          sample["one_hot_label"]))
 
+    # Make batch
     dataset = dataset.batch(batch_size)
 
     return dataset
@@ -35,14 +48,12 @@ def get_dataset(input_csv, batch_size=8):
 if __name__=="__main__":
 
     dataset = get_dataset("fma_small.csv")
-    # Create an iterator
-    iterator = iter(dataset)
+    batch = dataset.make_one_shot_iterator().get_next()
 
-    try:
-        # Get the first batch
-        batch_value = next(iterator)
+    with tf.Session() as sess:
+
+        # Evaluate first batch
+        batch_value = sess.run(batch)
         print("Training dataset generated a batch with:")
         for el in batch_value:
             print(f"A {type(el)} with shape {el.shape}.")
-    except tf.errors.OutOfRangeError:
-        print("End of dataset reached.")
