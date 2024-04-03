@@ -88,13 +88,27 @@ def get_dataset(input_csv, batch_size=8):
 # test dataset data generation
 if __name__=="__main__":
 
+    # Enable eager execution
+    tf.enable_eager_execution()
+
+    # Assuming you have already defined and obtained your dataset
     dataset = get_dataset("fma_small.csv")
-    batch = dataset.make_one_shot_iterator().get_next()
 
-    with tf.Session() as sess:
+    # Iterate over the dataset using a for loop
+    for batch in dataset:
+        # Access batch elements here
+        waveform_data, one_hot_labels, filenames, zcr_data = batch
 
-        # Evaluate first batch
-        batch_value = sess.run(batch)
-        print("Training dataset generated a batch with:")
-        for el in batch_value:
-            print(f"{el}:A {type(el)} with shape {el.shape}.")
+        # Convert filenames to string
+        filenames = [filename.decode("utf-8") for filename in filenames.numpy()]
+
+        # Convert numpy arrays to lists
+        waveform_data = waveform_data.numpy().tolist()
+        one_hot_labels = one_hot_labels.numpy().tolist()
+        zcr_data = zcr_data.numpy().tolist()
+
+        # Print batch information
+        print("Waveform data:", waveform_data)
+        print("One-hot labels:", one_hot_labels)
+        print("Filenames:", filenames)
+        print("ZCR data:", zcr_data)
