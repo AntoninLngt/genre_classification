@@ -66,9 +66,8 @@ def get_dataset(input_csv, batch_size=8):
 
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
-    dataset = dataset.unbatch()
-    dataset = dataset.map(lambda sample: dict(sample, zcr=zcr(sample["waveform"])))
-
+    dataset = dataset.flat_map(lambda x, y, z: tf.data.Dataset.from_tensor_slices((x, y, z)))
+    dataset = dataset.map(lambda x, y, z: (x, y, z, zcr(x)))
     #dataset = dataset.map(lambda sample: dict(sample, centroid=centroid(sample["waveform"])))
 
     #dataset = dataset.map(lambda sample: dict(sample, mfcc=mfcc(sample["waveform"][:, 0])))
