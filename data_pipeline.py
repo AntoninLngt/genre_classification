@@ -18,13 +18,13 @@ def audio_pipeline(audio, fs=44100):
     zcr = tf.reduce_mean(sign_changes, axis=1)
 
     # Compute STFT
-    stft = tf.signal.stft(audio, frame_length=256, frame_step=128, fft_length=256)
+    stft = tf.contrib.signal.stft(audio, frame_length=256, frame_step=128, fft_length=256)
 
     # Compute the magnitude spectrum
     magnitude_spectrum = tf.abs(stft)
 
     # Define frequency bins
-    frequencies = tf.signal.linear_to_mel_weight_matrix(
+    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(
         num_mel_bins=128,
         num_spectrogram_bins=tf.shape(magnitude_spectrum)[-1],
         sample_rate=fs,
