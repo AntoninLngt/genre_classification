@@ -17,11 +17,11 @@ def audio_pipeline(audio):
     zcr = tf.reduce_sum(zcr, axis=-1)
 
     # Compute spectral centroid
-    stft = tf.abs(tf.contrib.signal.stft(tf.cast(audio, tf.float32), frame_length=2048, frame_step=512, fft_length=2048))
     frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=22050, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
     spectral_centroids = tf.tensordot(stft, frequencies, 1)
     spectral_centroids = tf.reduce_sum(spectral_centroids, axis=1)
-    spectral_centroids /= tf.reduce_sum(stft, axis=1)
+    spectral_centroids = tf.expand_dims(spectral_centroids, axis=1)  # Add a new axis
+    spectral_centroids = tf.tile(spectral_centroids, [1, tf.shape(stft)[1]])  # Tile to match the shape of stft
 
     # Compute spectral rolloff
     cumsum = tf.cumsum(stft, axis=1)
@@ -34,7 +34,6 @@ def audio_pipeline(audio):
 
     # Stack all features
     features = tf.stack([zcr, spectral_centroids, tf.cast(rolloff, tf.float32)] + [mfccs], axis=1)
-
     return features
 
 def get_dataset(input_csv, batch_size=8):
