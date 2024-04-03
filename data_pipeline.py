@@ -45,19 +45,6 @@ def audio_pipeline(audio, fs=44100):
     threshold = 0.85 * total_energy[:, None]
     index = tf.argmax(tf.cast(cumulative_sum >= threshold, tf.int32), axis=1)
 
-    # Compute the spectral rolloff frequency
-    rolloff_freq = tf.gather_nd(frequencies, tf.expand_dims(index, axis=1))
-
-    mel_spectrogram = tf.contrib.signal.mel_spectrogram(
-        audio,
-        window_length=1024,
-        frame_step=256,
-        fft_length=1024,
-        num_mel_bins=40,
-        sample_rate=fs
-    )
-    log_mel_spectrogram = tf.log(mel_spectrogram + 1e-6)  # Add a small value to avoid log(0)
-
     # Compute MFCCs from the log Mel spectrogram
     mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(
         log_mel_spectrogram,
@@ -65,7 +52,7 @@ def audio_pipeline(audio, fs=44100):
     )
 
     # Stack all features
-    features = tf.concat([tf.expand_dims(zcr, axis=1), centroid, tf.expand_dims(rolloff_freq, axis=1), mfccs], axis=1)
+    features = tf.concat([tf.expand_dims(zcr, axis=1), centroid, mfccs], axis=1)
     return features
 
 def get_dataset(input_csv, batch_size=8):
