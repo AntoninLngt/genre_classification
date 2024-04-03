@@ -15,24 +15,20 @@ DATASET_DIR = "/data/fma_small/"
 def audio_pipeline(audio):
     features = []
 
-    # Evaluate the TensorFlow tensor within a TensorFlow session
-    with tf.Session() as sess:
-        audio_np = sess.run(audio)
-
     # Calcul du ZCR
-    zcr = librosa.zero_crossings(audio_np)
+    zcr = librosa.zero_crossings(audio)
     features.append(np.sum(zcr))
 
     # Calcul de la moyenne du Spectral centroid
-    spectral_centroids = librosa.feature.spectral_centroid(audio_np)[0]
+    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
     features.append(np.mean(spectral_centroids))
   
     # Calcul du spectral rolloff point
-    rolloff = librosa.feature.spectral_rolloff(audio_np)
+    rolloff = librosa.feature.spectral_rolloff(audio)
     features.append(np.mean(rolloff))
 
     # Calcul des moyennes des MFCC
-    mfcc = librosa.feature.mfcc(audio_np)
+    mfcc = librosa.feature.mfcc(audio)
 
     for x in mfcc:
         features.append(np.mean(x))
@@ -54,7 +50,7 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
 
     dataset = dataset.map(lambda sample: (sample["waveform"],
-                                       
+                                        audio_pipeline(sample["waveform"]),
                                         sample["one_hot_label"]))
 
     dataset = dataset.batch(batch_size)
