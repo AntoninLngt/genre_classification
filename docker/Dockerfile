@@ -16,8 +16,6 @@ RUN conda install -y -c anaconda pandas
 # install ffmpeg (for loading mp3 files)
 RUN conda install -y ffmpeg
 
-RUN pip install librosa
-
 #RUN apt-get install libffi-dev
 #RUN ln -s /usr/lib/x86_64-linux-gnu/libffi.so.6 /usr/lib/x86_64-linux-gnu/libffi.so.7
 

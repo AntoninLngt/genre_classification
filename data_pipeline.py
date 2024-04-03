@@ -6,35 +6,66 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-import librosa
 
 from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
-def audio_pipeline(audio):
+def audio_pipeline(audio, fs=44100):
     # Compute zero crossings
-    zcr = tf.cast(tf.abs(tf.sign(audio[:, :-1] * audio[:, 1:])), tf.float32)
-    zcr = tf.reduce_sum(zcr, axis=-1)
+    # Determine sign changes
+    sign_changes = tf.abs(tf.sign(audio) - tf.sign(audio[:, :-1]))
+    # Count the number of sign changes
+    zcr = tf.reduce_mean(sign_changes, axis=1)
 
-    # Compute STFT of the audio waveform
-    stft = tf.contrib.signal.stft(audio_frame, frame_length=frame_length, frame_step=frame_step, fft_length=fft_length)
+    # Compute STFT
+    stft = tf.signal.stft(audio, frame_length=256, frame_step=128, fft_length=256)
 
-    # Compute spectral centroid
+    # Compute the magnitude spectrum
     magnitude_spectrum = tf.abs(stft)
-    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(num_mel_bins=128, num_spectrogram_bins=1025, sample_rate=sample_rate, lower_edge_hertz=0.0, upper_edge_hertz=8000.0)
-    spectral_centroids = tf.tensordot(magnitude_spectrum, frequencies, 1)
-    spectral_centroids = tf.reduce_sum(spectral_centroids, axis=1)
-    # Compute spectral rolloff
-    cumsum = tf.cumsum(stft, axis=1)
-    total_energy = tf.reduce_sum(stft, axis=1)
-    rolloff = tf.argmax(tf.where(cumsum >= 0.85 * total_energy[:, None], True, False), axis=1)
 
-    # Compute MFCCs
-    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(tf.math.log(stft + 1e-6))
-    mfccs = tf.reduce_mean(mfccs, axis=1)
+    # Define frequency bins
+    frequencies = tf.signal.linear_to_mel_weight_matrix(
+        num_mel_bins=128,
+        num_spectrogram_bins=tf.shape(magnitude_spectrum)[-1],
+        sample_rate=fs,
+        lower_edge_hertz=0.0,
+        upper_edge_hertz=fs / 2)  # Nyquist frequency
+
+    # Compute the spectral centroid
+    centroid = tf.tensordot(magnitude_spectrum, frequencies, 1)
+
+    # Compute the magnitude spectrum
+    magnitude = tf.abs(stft)
+
+    # Compute the cumulative sum along the frequency axis
+    cumulative_sum = tf.cumsum(magnitude, axis=1)
+
+    # Find the frequency index where the cumulative sum exceeds 85% of the total energy
+    total_energy = tf.reduce_sum(magnitude, axis=1)
+    threshold = 0.85 * total_energy[:, None]
+    index = tf.argmax(tf.cast(cumulative_sum >= threshold, tf.int32), axis=1)
+
+    # Compute the spectral rolloff frequency
+    rolloff_freq = tf.gather_nd(tf.contrib.signal.linear_to_mel_weight_matrix(1, 256, fs)[0], tf.expand_dims(index, axis=1))
+
+    mel_spectrogram = tf.contrib.signal.mel_spectrogram(
+        audio,
+        window_length=1024,
+        frame_step=256,
+        fft_length=1024,
+        num_mel_bins=40,
+        sample_rate=fs
+    )
+    log_mel_spectrogram = tf.log(mel_spectrogram + 1e-6)  # Add a small value to avoid log(0)
+
+    # Compute MFCCs from the log Mel spectrogram
+    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(
+        log_mel_spectrogram,
+        num_mfccs=20
+    )
 
     # Stack all features
-    features = tf.stack([zcr, spectral_centroids, tf.cast(rolloff, tf.float32)] + [mfccs], axis=1)
+    features = tf.concat([tf.expand_dims(zcr, axis=1), centroid, tf.expand_dims(rolloff_freq, axis=1), mfccs], axis=1)
     return features
 
 def get_dataset(input_csv, batch_size=8):
