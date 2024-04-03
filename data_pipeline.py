@@ -36,7 +36,7 @@ def get_features_from_waveform(sample_waveform):
 
         return features
 
-    features = tf.py_function(audio_pipeline, [sample_waveform], tf.float32)
+    features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
     return features
 
 def get_dataset(input_csv, batch_size=8):
