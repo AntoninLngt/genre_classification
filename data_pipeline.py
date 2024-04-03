@@ -15,8 +15,9 @@ DATASET_DIR = "/data/fma_small/"
 def audio_pipeline(audio):
     features = []
 
-    # Convert TensorFlow tensor to NumPy array
-    audio_np = audio.numpy()
+    # Evaluate the TensorFlow tensor within a TensorFlow session
+    with tf.compat.v1.Session() as sess:
+        audio_np = sess.run(audio)
 
     # Calcul du ZCR
     zcr = librosa.zero_crossings(audio_np)
