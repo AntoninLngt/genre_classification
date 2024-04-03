@@ -6,34 +6,38 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-
 import librosa
 
 from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
-def get_features_from_waveform(audio):
-    features = []
+def get_features_from_waveform(sample_waveform):
+    def audio_pipeline(audio):
+        features = []
 
-    # Zero Crossing Rate
-    zcr = librosa.zero_crossings(audio)
-    features.append(tf.reduce_mean(zcr))
+        zcr = librosa.zero_crossings(audio)
+        features.append(sum(zcr))
 
-    # Spectral Centroid
-    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-    features.append(tf.reduce_mean(spectral_centroids))
+        # Calcul de la moyenne du Spectral centroid
 
-    # Spectral Rolloff
-    rolloff = librosa.feature.spectral_rolloff(audio)
-    features.append(tf.reduce_mean(rolloff))
-
-    # MFCCs (Mel-frequency cepstral coefficients)
-    mfcc = librosa.feature.mfcc(audio)
-
-    for x in mfcc:
-        features.append(tf.reduce_mean(x))
+        spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
+        features.append(tf.mean(spectral_centroids))
         
-    return tf.cast(features, tf.float32)
+        # Calcul du spectral rolloff point
+
+        rolloff = librosa.feature.spectral_rolloff(audio)
+        features.append(tf.mean(rolloff))
+
+        # Calcul des moyennes des MFCC
+
+        mfcc = librosa.feature.mfcc(audio)
+
+        for x in mfcc:
+            features.append(ft.mean(x))
+        return tf.cast(features, tf.float32)
+
+    features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
+    return features
 
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
@@ -52,7 +56,7 @@ def get_dataset(input_csv, batch_size=8):
     features_names = ['zcr', 'spectral_c', 'rolloff', 'mfcc1', 'mfcc2', 'mfcc3', 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9', 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15', 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20']
 
     # Map each sample to include its features with corresponding names
-    dataset = dataset.map(lambda sample: dict(sample, **dict(zip(features_names, tf.unstack(sample["features"], axis=1, num=24)))))
+    dataset = dataset.map(lambda sample: dict(sample, **dict(zip(features_names, tf.unstack(sample["features"], axis=1)))))
 
 
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
