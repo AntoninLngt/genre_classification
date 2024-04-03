@@ -23,13 +23,13 @@ def process_arguments():
 
     return HParams(**parser.parse_args().__dict__)
 
-
+tf.enable_eager_execution()
 if __name__=="__main__":
 
     # get arguments from command line
     params = process_arguments()
-    model = build_model()
-    tf.enable_eager_execution()
+    #model = build_model()
+    
     dataset = get_dataset("fma_small.csv")
 
     # Afficher les formes des tenseurs dans le premier lot
