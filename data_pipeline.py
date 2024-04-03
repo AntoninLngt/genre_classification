@@ -16,7 +16,7 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset_from_csv(input_csv)
 
     # add directory in the filename
-    dataset = dataset.map(lambda sample: dict(sample, filename=tf.string_join([DATASET_DIR, sample["filename"]])))
+    dataset = dataset.map(lambda sample: dict(sample, filename=tf.strings.join([DATASET_DIR, sample["filename"]])))
 
     n_sample = 11025  # Assuming this is the desired sample length
 
@@ -31,18 +31,17 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))) )
 
     # Extract audio features
-    dataset = dataset.map(lambda sample: (sample["waveform"], 
-                                          zcr(sample["waveform"]), 
-                                          spectral_centroids(sample["waveform"]),
-                                          mfcc(sample["waveform"]),
-                                          rolloff(sample["waveform"]),
+    dataset = dataset.map(lambda sample: (sample["filename"], 
+                                          zcr(sample["filename"]), 
+                                          spectral_centroids(sample["filename"]),
+                                          mfcc(sample["filename"]),
+                                          rolloff(sample["filename"]),
                                           sample["one_hot_label"]))
 
     # Make batch
     dataset = dataset.batch(batch_size)
 
     return dataset
-
 
 # test dataset data generation
 if __name__=="__main__":
