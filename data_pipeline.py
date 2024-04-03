@@ -11,33 +11,29 @@ import librosa
 from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
-def get_features_from_waveform(sample_waveform):
-    def audio_pipeline(audio):
-        features = []
+def get_features_from_waveform(audio):
+    features = []
 
-        zcr = librosa.zero_crossings(audio)
-        features.append(sum(zcr))
+    zcr = librosa.zero_crossings(audio)
+    features.append(sum(zcr))
 
-        # Calcul de la moyenne du Spectral centroid
+    # Calcul de la moyenne du Spectral centroid
 
-        spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-        features.append(np.mean(spectral_centroids))
-        
-        # Calcul du spectral rolloff point
+    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
+    features.append(np.mean(spectral_centroids))
+    
+    # Calcul du spectral rolloff point
 
-        rolloff = librosa.feature.spectral_rolloff(audio)
-        features.append(np.mean(rolloff))
+    rolloff = librosa.feature.spectral_rolloff(audio)
+    features.append(np.mean(rolloff))
 
-        # Calcul des moyennes des MFCC
+    # Calcul des moyennes des MFCC
 
-        mfcc = librosa.feature.mfcc(audio)
+    mfcc = librosa.feature.mfcc(audio)
 
-        for x in mfcc:
-            features.append(np.mean(x))
-        return features
-
-    features = tf.cast(features, tf.float32) 
-    return features
+    for x in mfcc:
+        features.append(np.mean(x))
+    return tf.cast(features, tf.float32)
 
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
