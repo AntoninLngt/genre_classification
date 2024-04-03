@@ -28,7 +28,8 @@ if __name__=="__main__":
 
     # get arguments from command line
     params = process_arguments()
-    #model = build_model()
+    model = build_model()
+    tf.enable_eager_execution()
     dataset = get_dataset("fma_small.csv")
 
     # Afficher les formes des tenseurs dans le premier lot
