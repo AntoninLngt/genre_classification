@@ -34,7 +34,8 @@ def get_features_from_waveform(sample_waveform):
 
         for x in mfcc:
             features.append(np.mean(x))
-        return features
+            
+        return np.array(features)
 
     features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
     return features
