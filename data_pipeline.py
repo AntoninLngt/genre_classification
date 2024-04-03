@@ -78,7 +78,6 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"],sample["zcr"],sample["centroid"],sample["mfcc"][:, 0]))
 
     dataset = dataset.batch(batch_size)
-    print (dataset)
     return dataset
 
 
