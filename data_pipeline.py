@@ -14,25 +14,27 @@ DATASET_DIR = "/data/fma_small/"
 def get_features_from_waveform(audio):
     features = []
 
-    zcr = librosa.zero_crossings(audio)
-    features.append(sum(zcr))
+    # Convert TensorFlow tensor to NumPy array
+    audio_np = audio.numpy()
 
-    # Calcul de la moyenne du Spectral centroid
+    # Zero Crossing Rate
+    zcr = librosa.zero_crossings(audio_np)
+    features.append(np.sum(zcr))
 
-    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
+    # Spectral Centroid
+    spectral_centroids = librosa.feature.spectral_centroid(audio_np)[0]
     features.append(np.mean(spectral_centroids))
-    
-    # Calcul du spectral rolloff point
 
-    rolloff = librosa.feature.spectral_rolloff(audio)
+    # Spectral Rolloff
+    rolloff = librosa.feature.spectral_rolloff(audio_np)
     features.append(np.mean(rolloff))
 
-    # Calcul des moyennes des MFCC
-
-    mfcc = librosa.feature.mfcc(audio)
+    # MFCCs (Mel-frequency cepstral coefficients)
+    mfcc = librosa.feature.mfcc(audio_np)
 
     for x in mfcc:
         features.append(np.mean(x))
+        
     return tf.cast(features, tf.float32)
 
 def get_dataset(input_csv, batch_size=8):
