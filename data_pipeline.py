@@ -19,7 +19,7 @@ def audio_pipeline(audio):
     features.append(tf.cast(zcr, tf.float32))
 
     # Compute spectral centroid
-    stft = tf.abs(tf.signal.stft(audio[:, 0]))
+    stft = tf.abs(tf.contrib.signal.stft(audio[:, 0]))
     freqs = tf.linspace(0.0, 1.0, stft.shape[1])
     spectral_centroids = tf.reduce_sum(stft * freqs, axis=1) / (tf.reduce_sum(stft, axis=1) + 1e-6)
     features.append(spectral_centroids)
