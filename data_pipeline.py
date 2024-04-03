@@ -92,4 +92,4 @@ if __name__=="__main__":
         batch_value = sess.run(batch)
         print("Training dataset generated a batch with:")
         for el in batch_value:
-            print(f"{el}:A {type(el)} with shape {el.shape}.")
+            print(f"A {type(el)} with shape {el.shape}.")
