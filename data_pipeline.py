@@ -36,15 +36,17 @@ def get_features_from_waveform(sample_waveform):
             features.append(np.mean(x))
         return features
 
-    features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
+    features = tf.py_func(audio_pipeline, [sample_waveform], [tf.float32] * 23)
     features_names = ['zcr', 'spectral_c', 'rolloff', 'mfcc1', 'mfcc2', 'mfcc3',
                 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9',
                 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15',
                 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20']
 
     features_dict = {}
-    for i, f in enumerate(features):
-        features_dict[features_names[i]] = f
+    for name, feature in zip(features_names, features):
+        features_dict[name] = feature
+        
+    return features_dict
 
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
