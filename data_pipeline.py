@@ -63,7 +63,7 @@ def get_dataset(input_csv, batch_size=8):
 
     dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample, 2))))
  
-    dataset = dataset.map(lambda sample: dict(sample, zrc=zrc(sample["waveform"])))
+    dataset = dataset.map(lambda sample: dict(sample, zcr=zcr(sample["waveform"])))
 
     dataset = dataset.map(lambda sample: dict(sample, centroid=centroid(sample["waveform"])))
 
