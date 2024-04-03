@@ -13,38 +13,30 @@ from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 DATASET_DIR = "/data/fma_small/"
 
 def audio_pipeline(audio):
+    features = []
 
-
-  features = []
-
-  # Convert TensorFlow tensor to NumPy array
+    # Convert TensorFlow tensor to NumPy array
     audio_np = audio.numpy()
 
-  # Calcul du ZCR
+    # Calcul du ZCR
+    zcr = librosa.zero_crossings(audio_np)
+    features.append(np.sum(zcr))
 
-  zcr = librosa.zero_crossings(audio)
-  features.append(sum(zcr))
-
-  # Calcul de la moyenne du Spectral centroid
-
-  spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-  features.append(np.mean(spectral_centroids))
+    # Calcul de la moyenne du Spectral centroid
+    spectral_centroids = librosa.feature.spectral_centroid(audio_np)[0]
+    features.append(np.mean(spectral_centroids))
   
-  # Calcul du spectral rolloff point
+    # Calcul du spectral rolloff point
+    rolloff = librosa.feature.spectral_rolloff(audio_np)
+    features.append(np.mean(rolloff))
 
-  rolloff = librosa.feature.spectral_rolloff(audio)
-  features.append(np.mean(rolloff))
+    # Calcul des moyennes des MFCC
+    mfcc = librosa.feature.mfcc(audio_np)
 
-  # Calcul des moyennes des MFCC
+    for x in mfcc:
+        features.append(np.mean(x))
 
-  mfcc = librosa.feature.mfcc(audio)
-
-  for x in mfcc:
-    features.append(np.mean(x))
-
-
-  return features
-
+    return features
 
 
 def get_dataset(input_csv, batch_size=8):
