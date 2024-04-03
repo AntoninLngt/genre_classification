@@ -25,7 +25,8 @@ def process_arguments():
 
 
 if __name__=="__main__":
-
+    # Enable eager execution
+    tf.enable_eager_execution()
     # get arguments from command line
     params = process_arguments()
     model = build_model()
