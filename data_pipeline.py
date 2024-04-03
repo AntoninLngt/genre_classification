@@ -11,16 +11,30 @@ from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
 def audio_pipeline(audio, fs=44100):
+    features = []
+
     # Compute zero crossings
     sign_changes = tf.abs(tf.sign(audio) - tf.sign(audio[:, :-1]))
     zcr = tf.reduce_mean(tf.cast(sign_changes, tf.float32), axis=1)
-
+    features.append(zcr)
+    
     # Compute STFT
     stft = tf.contrib.signal.stft(audio, frame_length=256, frame_step=128, fft_length=256)
 
     # Compute the magnitude spectrum
     magnitude_spectrum = tf.abs(stft)
 
+    # Compute the spectral centroid
+    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(
+        num_mel_bins=128,  # Adjust the number of Mel bins as needed
+        num_spectrogram_bins=tf.shape(magnitude_spectrum)[-1],
+        sample_rate=fs,
+        lower_edge_hertz=0.0,
+        upper_edge_hertz=fs / 2
+    )
+    centroid = tf.tensordot(magnitude_spectrum, frequencies, 1)
+    features.append(centroid)
+    
     # Define frequency bins for Mel spectrogram
     linear_to_mel_matrix = tf.contrib.signal.linear_to_mel_weight_matrix(
         num_mel_bins=40,  # Adjust the number of Mel bins as needed
@@ -36,20 +50,9 @@ def audio_pipeline(audio, fs=44100):
 
     # Compute MFCCs from the log Mel spectrogram
     mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
+    features.append(mfccs)
 
-    # Compute the spectral centroid
-    frequencies = tf.contrib.signal.linear_to_mel_weight_matrix(
-        num_mel_bins=128,  # Adjust the number of Mel bins as needed
-        num_spectrogram_bins=tf.shape(magnitude_spectrum)[-1],
-        sample_rate=fs,
-        lower_edge_hertz=0.0,
-        upper_edge_hertz=fs / 2
-    )
-    centroid = tf.tensordot(magnitude_spectrum, frequencies, 1)
-
-    # Stack all features
-    features = tf.concat([zcr[:, tf.newaxis], centroid, mfccs], axis=1)
-    return features
+    return tf.concat(features, axis=1)
 
 def get_dataset(input_csv, batch_size=8):
     """Function to build the dataset."""
