@@ -13,6 +13,11 @@ from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 DATASET_DIR = "/data/fma_small/"
 
 def get_features_from_waveform(sample_waveform):
+    
+    # Convert TensorFlow tensor to NumPy array
+    with tf.Session() as sess:
+        sample_waveform_np = sess.run(sample_waveform)
+
     features = []
 
     # Calcul du ZCR
