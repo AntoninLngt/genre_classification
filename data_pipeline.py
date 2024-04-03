@@ -19,7 +19,9 @@ def audio_pipeline(audio):
     features.append(tf.cast(zcr, tf.float32))
 
     # Compute spectral centroid
-    spectral_centroids = tf.reduce_mean(tf.contrib.signal.centroid(tf.abs(tf.signal.stft(audio[:, 0]))), axis=1)
+    stft = tf.abs(tf.signal.stft(audio[:, 0]))
+    freqs = tf.linspace(0.0, 1.0, stft.shape[1])
+    spectral_centroids = tf.reduce_sum(stft * freqs, axis=1) / (tf.reduce_sum(stft, axis=1) + 1e-6)
     features.append(spectral_centroids)
 
     # Compute spectral rolloff
@@ -27,7 +29,7 @@ def audio_pipeline(audio):
     features.append(rolloff)
 
     # Compute MFCCs
-    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(tf.math.log(tf.abs(tf.signal.stft(audio[:, 0])) + 1e-6))
+    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(tf.math.log(tf.abs(stft) + 1e-6))
     mfccs_mean = tf.reduce_mean(mfccs, axis=1)
     features.extend(mfccs_mean)
 
