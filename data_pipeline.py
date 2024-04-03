@@ -35,6 +35,7 @@ def centroid(audio, fs=44100):
     return centroid
 
 def mfcc(audio, fs=44100):
+    print(audio)
     # Compute STFT
     stft = tf.contrib.signal.stft(audio, frame_length=256, frame_step=128, fft_length=256)
     # Compute the magnitude spectrum
