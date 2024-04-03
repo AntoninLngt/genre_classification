@@ -26,7 +26,7 @@ def process_arguments():
 
 
 if __name__=="__main__":
-
+    tf.config.run_functions_eagerly(True)
     # get arguments from command line
     params = process_arguments()
 
