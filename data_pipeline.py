@@ -14,25 +14,24 @@ from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 DATASET_DIR = "/data/fma_small/"
 def get_features_from_waveform(audio):
     features = []
-    # Convert TensorFlow tensor to NumPy array
 
     # Zero Crossing Rate
     zcr = librosa.zero_crossings(audio)
-    features.append(zcr)
+    features.append(tf.reduce_mean(zcr))
 
     # Spectral Centroid
     spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-    features.append(spectral_centroids)
+    features.append(tf.reduce_mean(spectral_centroids))
 
     # Spectral Rolloff
     rolloff = librosa.feature.spectral_rolloff(audio)
-    features.append(rolloff)
+    features.append(tf.reduce_mean(rolloff))
 
     # MFCCs (Mel-frequency cepstral coefficients)
-    mfcc = librosa.feature.mfcc(audio_)
+    mfcc = librosa.feature.mfcc(audio)
 
     for x in mfcc:
-        features.append(x)
+        features.append(tf.reduce_mean(x))
         
     return tf.cast(features, tf.float32)
 
