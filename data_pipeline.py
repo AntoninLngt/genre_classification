@@ -42,8 +42,8 @@ def get_features_from_waveform(sample_waveform):
                 'mfcc10', 'mfcc11', 'mfcc12', 'mfcc13', 'mfcc14', 'mfcc15',
                 'mfcc16', 'mfcc17', 'mfcc18', 'mfcc19', 'mfcc20']
     features_dict = {}
-    for name, feature in zip(features_names, features):
-        features_dict[name] = feature
+    for i, name in enumerate(features_names):
+    features_dict[name] = tf.map_fn(lambda x: x[i], features)
 
     return features_dict
 
