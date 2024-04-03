@@ -16,7 +16,7 @@ def audio_pipeline(audio):
     features = []
 
     # Evaluate the tensor within the current TensorFlow session
-    audio_np = audio.eval()
+    audio_np = audio.numpy()
 
     # Calcul du ZCR
     zcr = librosa.zero_crossings(audio_np)
