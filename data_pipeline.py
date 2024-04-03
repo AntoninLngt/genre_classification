@@ -36,7 +36,7 @@ def get_features_from_waveform(sample_waveform):
             features.append(np.mean(x))
         return features
 
-    features = tf.py_func(audio_pipeline, [sample_waveform], tf.float32)
+    features = tf.numpy_function(audio_pipeline, [sample_waveform], tf.float32)
     print (features)    
     features_names = ['zcr', 'spectral_c', 'rolloff', 'mfcc1', 'mfcc2', 'mfcc3',
                 'mfcc4', 'mfcc5', 'mfcc6', 'mfcc7', 'mfcc8', 'mfcc9',
