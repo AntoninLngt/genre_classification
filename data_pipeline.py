@@ -29,7 +29,7 @@ def get_features_from_waveform(sample_waveform):
 
         # Calcul des moyennes des MFCC
         mfcc = librosa.feature.mfcc(audio)
-
+        print("MFCC shape:", mfcc.shape)  
         for x in mfcc:
             features.append(np.mean(x))
 
