@@ -11,7 +11,7 @@ def build_model():
         ]
     )
 
-    model.compile(loss="categorical_crossentropy", optimizer=Adam(), metrics=['accuracy'])
+    model.compile(loss="categorical_crossentropy", optimizer=SGD(), metrics=['accuracy'])
 
     return model
 
