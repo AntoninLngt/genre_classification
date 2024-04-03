@@ -5,8 +5,9 @@ from tensorflow.keras.optimizers import SGD
 def build_model():
     model = Sequential(
         [
-            Dense(128, input_dim=11025 * 2, activation='relu'),
-            Dense(10,activation="softmax")
+            InputLayer(input_shape=[11025, 2], name="Input_layer"),
+            Flatten(name="Flatten"),
+            Dense(activation="softmax", name="Dense", trainable=True, units=10),
         ]
     )
 
