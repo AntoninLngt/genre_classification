@@ -45,14 +45,15 @@ def audio_pipeline(audio, fs=44100):
     threshold = 0.85 * total_energy[:, None]
     index = tf.argmax(tf.cast(cumulative_sum >= threshold, tf.int32), axis=1)
 
-    mel_spectrogram = tf.contrib.signal.mel_spectrogram(
-        audio,
-        window_length=1024,
-        frame_step=256,
-        fft_length=1024,
+    # Compute log power Mel spectrogram manually
+    linear_to_mel_matrix = tf.contrib.signal.linear_to_mel_weight_matrix(
         num_mel_bins=40,
-        sample_rate=fs
-    )
+        num_spectrogram_bins=tf.shape(magnitude_spectrum)[-1],
+        sample_rate=fs,
+        lower_edge_hertz=0.0,
+        upper_edge_hertz=fs / 2)  # Nyquist frequency
+
+    mel_spectrogram = tf.tensordot(magnitude_spectrum, linear_to_mel_matrix, 1)
     log_mel_spectrogram = tf.log(mel_spectrogram + 1e-6)  # Add a small value to avoid log(0)
 
     # Compute MFCCs from the log Mel spectrogram
@@ -60,6 +61,7 @@ def audio_pipeline(audio, fs=44100):
         log_mel_spectrogram,
         num_mfccs=20
     )
+
 
     # Stack all features
     features = tf.concat([tf.expand_dims(zcr, axis=1), centroid,mfccs], axis=1)
