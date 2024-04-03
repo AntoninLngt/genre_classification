@@ -15,21 +15,21 @@ def audio_pipeline(audio):
     features = []
 
     # Compute zero crossings
-    zcr = librosa.zero_crossings(audio)
+    zcr = tf.py_func(librosa.zero_crossings, [audio], tf.bool)
     features.append(tf.cast(tf.reduce_sum(tf.cast(zcr, tf.float32)), tf.float32))
 
     # Compute spectral centroid
-    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-    features.append(tf.cast(tf.reduce_mean(tf.cast(spectral_centroids, tf.float32)), tf.float32))
+    spectral_centroids = tf.py_func(librosa.feature.spectral_centroid, [audio], tf.float32)[0]
+    features.append(tf.reduce_mean(spectral_centroids))
 
     # Compute spectral rolloff
-    rolloff = librosa.feature.spectral_rolloff(audio)[0]
-    features.append(tf.cast(tf.reduce_mean(tf.cast(rolloff, tf.float32)), tf.float32))
+    rolloff = tf.py_func(librosa.feature.spectral_rolloff, [audio], tf.float32)[0]
+    features.append(tf.reduce_mean(rolloff))
 
     # Compute MFCCs
-    mfccs = librosa.feature.mfcc(audio)
+    mfccs = tf.py_func(librosa.feature.mfcc, [audio], tf.float32)
     for mfcc in mfccs:
-        features.append(tf.cast(tf.reduce_mean(tf.cast(mfcc, tf.float32)), tf.float32))
+        features.append(tf.reduce_mean(mfcc))
 
     return features
 
