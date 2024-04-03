@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-from utils import one_hot_label, load_audio_waveform, dataset_from_csv,mfccs,spectrogram
+from utils import one_hot_label, load_audio_waveform, dataset_from_csv,zcr,spectral_centroids,mfcc,rolloff
 
 DATASET_DIR = "/data/fma_small/"
 
