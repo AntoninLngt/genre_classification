@@ -54,7 +54,7 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
 
     dataset = dataset.map(lambda sample: (sample["waveform"],
-                                        audio_pipeline(sample["waveform"]),
+                                       
                                         sample["one_hot_label"]))
 
     dataset = dataset.batch(batch_size)
