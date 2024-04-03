@@ -7,41 +7,63 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-from utils import one_hot_label, load_audio_waveform, dataset_from_csv,zcr,spectral_centroids,mfcc,rolloff
+from utils import one_hot_label, load_audio_waveform, dataset_from_csv
 
 DATASET_DIR = "/data/fma_small/"
 
-def get_dataset(input_csv, batch_size=8):
-    # build dataset from csv file
-    dataset = dataset_from_csv(input_csv)
+def audio_pipeline(audio):
 
-    # add directory in the filename
+
+  features = []
+
+  # Calcul du ZCR
+
+  zcr = librosa.zero_crossings(audio)
+  features.append(sum(zcr))
+
+  # Calcul de la moyenne du Spectral centroid
+
+  spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
+  features.append(np.mean(spectral_centroids))
+  
+  # Calcul du spectral rolloff point
+
+  rolloff = librosa.feature.spectral_rolloff(audio)
+  features.append(np.mean(rolloff))
+
+  # Calcul des moyennes des MFCC
+
+  mfcc = librosa.feature.mfcc(audio)
+
+  for x in mfcc:
+    features.append(np.mean(x))
+
+
+  return features
+
+
+
+def get_dataset(input_csv, batch_size=8):
+    """Function to build the dataset."""
+    dataset = dataset_from_csv(input_csv)
     dataset = dataset.map(lambda sample: dict(sample, filename=tf.strings.join([DATASET_DIR, sample["filename"]])))
 
-    n_sample = 11025  # Assuming this is the desired sample length
+    n_sample = 11025
+    dataset = dataset.map(lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample, :]), num_parallel_calls=32)
 
-    # load audio and take the first n_sample samples only
-    dataset = dataset.map(lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample,:]), num_parallel_calls=32)
+    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample, 2))))
 
-    # Filter out badly shaped waveforms (due to loading errors)
-    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample,2))))
-
-    # one hot encoding of labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))) )
+    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
 
-    # Extract audio features
-    dataset = dataset.map(lambda sample: (sample["filename"], 
-                                          zcr("filename"), 
-                                          spectral_centroids("filename"),
-                                          mfcc("filename"),
-                                          rolloff("filename"),
-                                          sample["one_hot_label"]))
+    dataset = dataset.map(lambda sample: (sample["waveform"],
+                                        audio_pipeline(sample["waveform"]),
+                                        sample["one_hot_label"]))
 
-    # Make batch
     dataset = dataset.batch(batch_size)
 
     return dataset
+
 
 # test dataset data generation
 if __name__=="__main__":

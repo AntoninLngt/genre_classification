@@ -29,24 +29,3 @@ def dataset_from_csv(csv_path, **kwargs):
 
     dataset = tf.data.Dataset.from_tensor_slices({key:df[key].values for key in df })
     return dataset
-
-
-def zcr(filename):
-    audio = load_audio_waveform(filename)
-    zcr = librosa.zero_crossings(audio)
-    return zcr
-
-def spectral_centroids(filename):
-    audio = load_audio_waveform(filename)
-    spectral_centroids = librosa.feature.spectral_centroid(audio)[0]
-    return spectral_centroids
-
-def mfcc(filename):
-    audio = load_audio_waveform(filename)
-    mfcc = librosa.feature.mfcc(audio)
-    return mfccs
-
-def rolloff(filename):
-    audio = load_audio_waveform(filename)
-    rolloff = librosa.feature.spectral_rolloff(audio)
-    return rolloff
