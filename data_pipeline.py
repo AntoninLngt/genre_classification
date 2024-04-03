@@ -41,7 +41,7 @@ def mfcc(audio, fs=44100):
     magnitude_spectrum = tf.abs(stft)
     # Compute the Mel spectrogram
     linear_to_mel_matrix = tf.contrib.signal.linear_to_mel_weight_matrix(
-        num_mel_bins=10000,
+        num_mel_bins=100000,
         num_spectrogram_bins=tf.shape(magnitude_spectrum)[-1],
         sample_rate=fs,
         lower_edge_hertz=0.0,
