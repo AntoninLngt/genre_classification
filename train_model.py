@@ -31,5 +31,4 @@ if __name__=="__main__":
     with tf.Graph().as_default():
         model = build_model()
         dataset = get_dataset("fma_small.csv")
-        dataset.element_spec
-        #model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
+        model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
