@@ -87,6 +87,10 @@ if __name__=="__main__":
     dataset = get_dataset("fma_small.csv")
     batch = dataset.make_one_shot_iterator().get_next()
 
+     # Print the dataset contents
+    iterator = dataset.make_one_shot_iterator()
+    next_element = iterator.get_next()
+    
     with tf.Session() as sess:
         try:
             while True:
