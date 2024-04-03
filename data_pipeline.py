@@ -57,11 +57,7 @@ def audio_pipeline(audio, fs=44100):
     log_mel_spectrogram = tf.log(mel_spectrogram + 1e-6)  # Add a small value to avoid log(0)
 
     # Compute MFCCs from the log Mel spectrogram
-    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(
-        log_mel_spectrogram,
-       dct_coefficient_count=20
-    )
-
+    mfccs = tf.contrib.signal.mfccs_from_log_mel_spectrograms(log_mel_spectrogram)
 
     # Stack all features
     features = tf.concat([tf.expand_dims(zcr, axis=1), centroid,mfccs], axis=1)
