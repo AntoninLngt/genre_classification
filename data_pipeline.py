@@ -75,7 +75,7 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
 
     # Select only features and annotation
-    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"],sample["zcr"],sample["centroid"],sample["mfcc"][:, 0]))
+    dataset = dataset.map(lambda sample: (sample["waveform"],sample["zcr"],sample["centroid"],sample["mfcc"][:, 0], sample["one_hot_label"]))
 
     dataset = dataset.batch(batch_size)
     return dataset
