@@ -32,4 +32,22 @@ if __name__=="__main__":
 
     model = build_model()
     dataset = get_dataset("fma_small.csv")
-    model.fit(dataset, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
+
+    features = df[["waveform","one_hot_label",'zcr', 'centroid', 'mfcc']]
+
+    labels = df["genre"]
+
+    train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size = 0.25, random_state = 0)
+
+    print('Training Features Shape:', train_features.shape)
+    print('Training Labels Shape:', train_labels.shape)
+    print('Testing Features Shape:', test_features.shape)
+    print('Testing Labels Shape:', test_labels.shape)
+
+    model.fit(train_features, train_labels, steps_per_epoch=params.steps_per_epoch, epochs=params.epochs)
+    # prédiction
+    predictions = model.predict_classes(test_features)
+
+    # evaluation du modèle
+    _, accuracy = model.evaluate(test_features, test_labels, verbose=0)
+    print('Accuracy: %.2f' % (accuracy*100))
