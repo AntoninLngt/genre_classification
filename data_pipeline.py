@@ -28,9 +28,9 @@ def get_features_from_waveform(sample_waveform):
         features.append(np.mean(rolloff))
 
         # Calcul des moyennes des MFCC
-        mfcc = librosa.feature.mfcc(audio)
-        for x in mfcc:
-            features.append(np.mean(x, axis=0))
+        #mfcc = librosa.feature.mfcc(audio)
+        #for x in mfcc:
+        #    features.append(np.mean(x, axis=0))
 
         return features
 
