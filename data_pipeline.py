@@ -108,8 +108,5 @@ if __name__=="__main__":
         zcr_data = zcr_data.numpy().tolist()
 
         # Print batch information
-        print("Waveform data:", waveform_data)
-        print("One-hot labels:", one_hot_labels)
-        print("Filenames:", filenames)
         print("ZCR data:", zcr_data)
         break
