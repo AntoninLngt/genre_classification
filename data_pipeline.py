@@ -66,20 +66,15 @@ def get_dataset(input_csv, batch_size=8):
 
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
-    
-    # Flatten the dataset before applying zcr calculation
-    dataset = dataset.flat_map(lambda sample: tf.data.Dataset.from_tensors(sample))
 
     # Calculate ZCR
-    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"], sample["filename"], zcr(sample["waveform"])))
+    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"], sample["filename"]))
 
+    # Calculate centroid
+    dataset = dataset.map(lambda waveform, one_hot_label, filename: (waveform, one_hot_label, filename, centroid(waveform)))
 
-    dataset = dataset.map(lambda sample: dict(sample, centroid=centroid(sample["waveform"])))
-
-    dataset = dataset.map(lambda sample: dict(sample, mfcc=mfcc(sample["waveform"][:, 0])))
-    # Select only features and annotation
-    #,sample["centroid"],sample["mfcc"][:, 0]
-    #dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"],sample["zcr"]))
+    # Calculate MFCC
+    dataset = dataset.map(lambda waveform, one_hot_label, filename, centroid: (waveform, one_hot_label, filename, centroid, mfcc(waveform[:, 0])))
 
     dataset = dataset.batch(batch_size)
     return dataset
