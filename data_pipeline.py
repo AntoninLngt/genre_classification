@@ -68,13 +68,13 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
 
     # Calculate ZCR
-    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"], sample["filename"]))
+    #dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"], zrc(waveform)))
 
     # Calculate centroid
-    dataset = dataset.map(lambda waveform, one_hot_label, filename: (waveform, one_hot_label, filename, centroid(waveform)))
+    #dataset = dataset.map(lambda waveform, one_hot_label, filename: (waveform, one_hot_label, zrc, centroid(waveform)))
 
     # Calculate MFCC
-    dataset = dataset.map(lambda waveform, one_hot_label, filename, centroid: (waveform, one_hot_label, filename, centroid, mfcc(waveform[:, 0])))
+   # dataset = dataset.map(lambda waveform, one_hot_label, filename, centroid: (waveform, one_hot_label, zrc, centroid, mfcc(waveform[:, 0])))
 
     dataset = dataset.batch(batch_size)
     return dataset
