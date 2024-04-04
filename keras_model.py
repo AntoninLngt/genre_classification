@@ -1,6 +1,7 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import InputLayer, Flatten, Dense, concatenate
-from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.layers import InputLayer, Flatten, Dense
+from tensorflow.keras.layers import concatenate
+from tensorflow.keras.optimizers import Adam
 
 def build_model():
     # Define the first branch for audio input
@@ -21,7 +22,7 @@ def build_model():
         Dense(units=10, activation="softmax", name="Output")
     ])
     
-    model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=['accuracy'])
+    model.compile(loss="categorical_crossentropy", optimizer=Adam(), metrics=['accuracy'])
 
     return merged_model
 
