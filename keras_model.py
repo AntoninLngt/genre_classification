@@ -1,6 +1,6 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import InputLayer, Flatten, Dense
-from tensorflow.keras.layers import concatenate
+from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.optimizers import Adam
 
 def build_model():
@@ -18,7 +18,7 @@ def build_model():
     
     # Combine both branches
     merged_model = Sequential([
-        concatenate([model_audio, model_other]),
+        Concatenate([model_audio, model_other]),
         Dense(units=10, activation="softmax", name="Output")
     ])
     
