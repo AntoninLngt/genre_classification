@@ -22,7 +22,7 @@ def build_model():
         Dense(units=10, activation="softmax", name="Output")
     ])
     
-    model.compile(loss="categorical_crossentropy", optimizer=Adam(), metrics=['accuracy'])
+    merged_model.compile(loss="categorical_crossentropy", optimizer=Adam(), metrics=['accuracy'])
 
     return merged_model
 
