@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import InputLayer, Flatten, Dense
+from tensorflow.keras.layers import InputLayer, Flatten, Dense, concatenate
 from tensorflow.keras.optimizers import SGD
 
 def build_model():
