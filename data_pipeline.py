@@ -59,7 +59,7 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset_from_csv(input_csv)
     dataset = dataset.map(lambda sample: dict(sample, filename=tf.strings.join([DATASET_DIR, sample["filename"]])))
 
-    n_sample = 11025
+    n_sample = 11025*100
     # load audio and take first quarter of second only
     dataset = dataset.map( lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample,:]), num_parallel_calls=32)
 

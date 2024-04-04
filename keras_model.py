@@ -5,7 +5,7 @@ from tensorflow.keras.optimizers import SGD
 def build_model():
     model = Sequential(
         [
-            InputLayer(input_shape=[11025, 2], name="Input_layer"),
+            InputLayer(input_shape=[11025*100, 2], name="Input_layer"),
             Flatten(name="Flatten"),
             Dense(activation="softmax", name="Dense", trainable=True, units=10),
         ]
