@@ -1,30 +1,19 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import InputLayer, Flatten, Dense
-from tensorflow.keras.layers import Concatenate
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD
 
 def build_model():
-    # Define the first branch for audio input
-    model_audio = Sequential([
-        InputLayer(input_shape=[11025, 2], name="Input_audio"),
-        Flatten(name="Flatten_audio")
-    ])
-    
-    # Define the second branch for other input
-    model_other = Sequential([
-        InputLayer(input_shape=[11025], name="Input_other"),
-        Flatten(name="Flatten_other")
-    ])
-    
-    # Combine both branches
-    merged_model = Sequential([
-        Concatenate([model_audio, model_other]),
-        Dense(units=10, activation="softmax", name="Output")
-    ])
-    
-    merged_model.compile(loss="categorical_crossentropy", optimizer=Adam(), metrics=['accuracy'])
+    model = Sequential(
+        [
+            InputLayer(input_shape=[11025, 2], name="Input_layer"),
+            Flatten(name="Flatten"),
+            Dense(activation="softmax", name="Dense", trainable=True, units=10),
+        ]
+    )
 
-    return merged_model
+    model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=['accuracy'])
+
+    return model
 
 
 if __name__=="__main__":
