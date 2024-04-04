@@ -60,22 +60,20 @@ def get_dataset(input_csv, batch_size=8):
     dataset = dataset.map(lambda sample: dict(sample, filename=tf.strings.join([DATASET_DIR, sample["filename"]])))
 
     n_sample = 11025
-    dataset = dataset.map(lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample, :]), num_parallel_calls=32)
+    # load audio and take first quarter of second only
+    dataset = dataset.map( lambda sample: dict(sample, waveform=load_audio_waveform(sample["filename"])[:n_sample,:]), num_parallel_calls=32)
 
-    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample, 2))))
+    # Filter out badly shaped waveforms (due to loading errors)
+    dataset = dataset.filter(lambda sample: tf.reduce_all(tf.equal(tf.shape(sample["waveform"]), (n_sample,2))))
 
+    # one hot encoding of labels
     label_list = ["Electronic", "Folk", "Hip-Hop", "Indie-Rock", "Jazz", "Old-Time", "Pop", "Psych-Rock", "Punk", "Rock"]
-    dataset = dataset.map(lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))))
+    dataset = dataset.map( lambda sample: dict(sample, one_hot_label=one_hot_label(sample["genre"], tf.constant(label_list))) )
 
-    # Calculate ZCR
-    #dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"], zrc(waveform)))
+    # Select only features and annotation
+    dataset = dataset.map(lambda sample: (sample["waveform"], sample["one_hot_label"]))
 
-    # Calculate centroid
-    #dataset = dataset.map(lambda waveform, one_hot_label, filename: (waveform, one_hot_label, zrc, centroid(waveform)))
-
-    # Calculate MFCC
-   # dataset = dataset.map(lambda waveform, one_hot_label, filename, centroid: (waveform, one_hot_label, zrc, centroid, mfcc(waveform[:, 0])))
-
+    # Make batch
     dataset = dataset.batch(batch_size)
     return dataset
 
