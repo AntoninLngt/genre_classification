@@ -5,13 +5,12 @@ from tensorflow.keras.optimizers import SGD
 def build_model():
     model = Sequential(
         [
-            InputLayer(input_shape=[11025, 2], name="Input_layer"),
-            Flatten(name="Flatten"),
+            Dense(164, input_dim=11025*2, activation='relu'),
             Dense(activation="softmax", name="Dense", trainable=True, units=10),
         ]
     )
 
-    model.compile(loss="categorical_crossentropy", optimizer=SGD(), metrics=['accuracy'])
+    model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=['accuracy'])
 
     return model
 
